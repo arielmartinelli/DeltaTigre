@@ -1,0 +1,33 @@
+# --- dependencias y build ---
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# --- secretos y base de datos local ---
+.env
+.env.local
+.env*.local
+data/*.db
+data/*.db-*
+*.sqlite
+*.sqlite3
+
+# --- fotos subidas desde el panel ---
+web/public/uploads/*
+!web/public/uploads/.gitkeep
+
+# --- caches y logs ---
+*.log
+npm-debug.log*
+yarn-error.log*
+.turbo/
+*.tsbuildinfo
+
+# --- sistema / editores ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
