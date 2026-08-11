@@ -18,8 +18,8 @@ export default async function ExperienciasPage() {
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <Reveal className="max-w-3xl">
           <Eyebrow>Experiencias</Eyebrow>
-          <h1 className="mt-6 font-display text-[clamp(2.4rem,6.5vw,4.6rem)] leading-[0.98]">
-            Qué hacer<br /><span className="italic text-palm-deep">en el Delta</span>
+          <h1 className="mt-6 font-display text-[clamp(2.7rem,7.2vw,5.1rem)] leading-[0.98]">
+            Qué hacer<br /><span className="script script-verde">en el Delta</span>
           </h1>
           <p className="mt-7 max-w-xl text-[16px] leading-relaxed text-ink-70">
             El Delta no se recorre con prisa. Estas son las cosas que más disfrutan quienes se quedan con nosotros.
@@ -43,7 +43,7 @@ export default async function ExperienciasPage() {
 
                 <Reveal delay={120} className={`md:col-span-5 ${flip ? "md:[direction:ltr]" : ""}`}>
                   <Eyebrow>{a.tag}</Eyebrow>
-                  <h2 className="mt-5 font-display text-[clamp(1.9rem,4.4vw,3rem)] leading-[1.04]">{a.title}</h2>
+                  <h2 className="mt-5 font-display text-[clamp(2.15rem,4.9vw,3.35rem)] leading-[1.04]">{a.title}</h2>
                   <p className="mt-5 text-[15.5px] leading-relaxed text-ink-70">{a.body}</p>
                   <p className="mt-5 border-l-2 border-palm pl-4 text-[14px] italic leading-relaxed text-ink-45">{a.summary}</p>
                 </Reveal>
@@ -56,7 +56,7 @@ export default async function ExperienciasPage() {
       <section className="mx-auto mt-28 max-w-6xl px-5 md:px-8">
         <Reveal className="flex flex-col items-center gap-6 rounded-[2.25rem] bg-ink px-7 py-16 text-center text-cream md:py-20">
           <Eyebrow dark>Reservas</Eyebrow>
-          <h2 className="max-w-xl font-display text-[clamp(2rem,4.8vw,3.2rem)] leading-[1.03]">
+          <h2 className="max-w-xl font-display text-[clamp(2.25rem,5.3vw,3.6rem)] leading-[1.03]">
             ¿Te tienta? Elegí tus fechas
           </h2>
           <CTA href="/cabanas" variant="wa" icon="cal">Ver disponibilidad</CTA>

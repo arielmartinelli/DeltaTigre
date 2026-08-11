@@ -26,8 +26,8 @@ export default async function UbicacionPage() {
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <Reveal className="max-w-3xl">
           <Eyebrow>Cómo llegar</Eyebrow>
-          <h1 className="mt-6 font-display text-[clamp(2.4rem,6.5vw,4.6rem)] leading-[0.98]">
-            Arroyo Gambado,<br /><span className="italic text-palm-deep">primera sección</span>
+          <h1 className="mt-6 font-display text-[clamp(2.7rem,7.2vw,5.1rem)] leading-[0.98]">
+            Arroyo Gambado,<br /><span className="script script-verde">primera sección</span>
           </h1>
           <p className="mt-7 max-w-xl text-[16px] leading-relaxed text-ink-70">
             A 40 minutos de Buenos Aires y a 25 minutos de lancha de la Estación Fluvial de Tigre. Sin autos, sin ruido:
@@ -42,7 +42,7 @@ export default async function UbicacionPage() {
         {/* Pasos */}
         <section className="mt-24">
           <Reveal><Eyebrow>Paso a paso</Eyebrow>
-            <h2 className="mt-5 font-display text-[clamp(1.9rem,4.4vw,3rem)]">Tres tramos y llegaste</h2>
+            <h2 className="mt-5 font-display text-[clamp(2.15rem,4.9vw,3.35rem)]">Tres tramos y llegaste</h2>
           </Reveal>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {steps.map((s, i) => (
@@ -52,9 +52,9 @@ export default async function UbicacionPage() {
                     <span className="grid h-11 w-11 place-items-center rounded-full bg-palm-wash text-palm-deep">
                       <Icon name={s.icon} className="h-5 w-5" />
                     </span>
-                    <span className="display text-[42px] leading-none text-ink/10">{i + 1}</span>
+                    <span className="display text-[46px] leading-none text-ink/10">{i + 1}</span>
                   </div>
-                  <h3 className="font-display text-[22px]">{s.t}</h3>
+                  <h3 className="font-display text-[25px]">{s.t}</h3>
                   <p className="text-[14.5px] leading-relaxed text-ink-45">{s.d}</p>
                 </div>
               </Reveal>
@@ -72,7 +72,7 @@ export default async function UbicacionPage() {
                     sizes="(max-width:768px) 100vw, 50vw" className="object-cover" />
                 </div>
                 <div className="p-6">
-                  <h3 className="font-display text-[24px]">{p.name}</h3>
+                  <h3 className="font-display text-[27px]">{p.name}</h3>
                   <p className="mt-2 flex items-center gap-2 text-[14px] text-ink-45">
                     <Icon name="pin" className="h-4 w-4 text-palm" />{p.address}
                   </p>
@@ -88,7 +88,7 @@ export default async function UbicacionPage() {
         {/* Alrededores */}
         <section className="mt-16">
           <Reveal><Eyebrow>Alrededores</Eyebrow>
-            <h2 className="mt-5 font-display text-[clamp(1.9rem,4.4vw,3rem)]">Qué hay cerca</h2>
+            <h2 className="mt-5 font-display text-[clamp(2.15rem,4.9vw,3.35rem)]">Qué hay cerca</h2>
           </Reveal>
           <div className="mt-10 grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
             {["Atracciones", "Gastronomia", "Transporte", "Aeropuertos"].map((cat, i) => (

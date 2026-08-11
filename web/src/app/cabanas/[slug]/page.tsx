@@ -71,7 +71,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 </span>
               )}
             </div>
-            <h1 className="mt-5 font-display text-[clamp(2.4rem,6vw,4.2rem)] leading-[0.98]">{p.name}</h1>
+            <h1 className="mt-5 font-display text-[clamp(2.7rem,6.6vw,4.7rem)] leading-[0.98]">{p.name}</h1>
             <p className="mt-4 flex items-center gap-2 text-[14px] text-ink-45">
               <Icon name="pin" className="h-4 w-4 text-palm" />{p.address}
             </p>
@@ -85,7 +85,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
         <div className="mt-20 grid gap-14 lg:grid-cols-12 lg:gap-12">
           <div className="space-y-20 lg:col-span-7">
             <Reveal>
-              <h2 className="font-display text-[clamp(1.8rem,4vw,2.6rem)] leading-tight">{p.tagline}</h2>
+              <h2 className="font-display text-[clamp(2rem,4.4vw,2.9rem)] leading-tight">{p.tagline}</h2>
               <div className="mt-6 space-y-4 text-[15.5px] leading-relaxed text-ink-70">
                 {p.description.split("\n\n").map((par, i) => <p key={i}>{par}</p>)}
               </div>
@@ -99,7 +99,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 ].map(([ic, n, l]) => (
                   <li key={l}>
                     <Icon name={ic} className="h-5 w-5 text-palm" />
-                    <p className="mt-3 display text-[22px] leading-none">{n}</p>
+                    <p className="mt-3 display text-[25px] leading-none">{n}</p>
                     <p className="mt-1 text-[12.5px] text-ink-45">{l}</p>
                   </li>
                 ))}
@@ -128,7 +128,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             {/* Todos los servicios */}
             <Reveal>
               <Eyebrow>Servicios y equipamiento</Eyebrow>
-              <h3 className="mt-5 font-display text-[clamp(1.6rem,3.4vw,2.2rem)]">Todo lo que vas a encontrar</h3>
+              <h3 className="mt-5 font-display text-[clamp(1.8rem,3.8vw,2.45rem)]">Todo lo que vas a encontrar</h3>
               <div className="mt-8 grid gap-x-10 gap-y-9 sm:grid-cols-2">
                 {groups.map((g) => (
                   <div key={g.category}>
@@ -169,7 +169,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             {/* Ubicacion */}
             <Reveal>
               <Eyebrow>Ubicación</Eyebrow>
-              <h3 className="mt-5 font-display text-[clamp(1.6rem,3.4vw,2.2rem)]">Dónde queda</h3>
+              <h3 className="mt-5 font-display text-[clamp(1.8rem,3.8vw,2.45rem)]">Dónde queda</h3>
               <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-70">
                 {p.address}. Se llega en lancha colectiva desde la Estación Fluvial de Tigre, a 2,2 km del Parque de la Costa.
               </p>
@@ -208,7 +208,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
           <Reveal className="mb-9 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <Eyebrow>En los alrededores</Eyebrow>
-              <h2 className="mt-5 font-display text-[clamp(1.9rem,4.4vw,3rem)]">Cosas para hacer cerca</h2>
+              <h2 className="mt-5 font-display text-[clamp(2.15rem,4.9vw,3.35rem)]">Cosas para hacer cerca</h2>
             </div>
             <CTA href="/experiencias" variant="outline" icon="beach">Ver todas</CTA>
           </Reveal>
@@ -223,7 +223,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                   </span>
                   <span className="block px-5 py-5">
                     <span className="tag bg-palm-wash text-palm-deep">{a.tag}</span>
-                    <span className="mt-3 block font-display text-[20px]">{a.title}</span>
+                    <span className="mt-3 block font-display text-[22px]">{a.title}</span>
                     <span className="mt-1.5 block text-[13.5px] leading-relaxed text-ink-45">{a.summary}</span>
                   </span>
                 </Link>
@@ -238,7 +238,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             <Reveal className="mt-16 mb-6 flex flex-col gap-5 rounded-[2rem] bg-ink px-7 py-10 text-cream sm:flex-row sm:items-center sm:justify-between md:px-10">
               <div>
                 <Eyebrow dark>La otra casa</Eyebrow>
-                <h3 className="mt-4 font-display text-[clamp(1.7rem,3.6vw,2.4rem)] leading-tight">{other.name}</h3>
+                <h3 className="mt-4 font-display text-[clamp(1.9rem,4vw,2.7rem)] leading-tight">{other.name}</h3>
                 <p className="mt-2 max-w-md text-[14.5px] text-cream/60">{other.tagline}</p>
               </div>
               <CTA href={`/cabanas/${other.slug}`} variant="outline"

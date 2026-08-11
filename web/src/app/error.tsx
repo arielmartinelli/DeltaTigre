@@ -8,7 +8,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   return (
     <div className="mx-auto flex min-h-[80dvh] max-w-2xl flex-col items-center justify-center gap-6 px-5 text-center">
       <span className="tag bg-palm-wash text-palm-deep">Algo salió mal</span>
-      <h1 className="font-display text-[clamp(1.8rem,4.6vw,2.8rem)] leading-tight">
+      <h1 className="font-display text-[clamp(2rem,5.1vw,3.1rem)] leading-tight">
         No pudimos cargar esta página
       </h1>
       <p className="max-w-sm text-[15px] leading-relaxed text-ink-45">

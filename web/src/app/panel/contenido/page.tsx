@@ -43,7 +43,7 @@ export default async function ContentPanel() {
             <div key={a.id} className="shell">
               <div className="core p-5 sm:p-6">
                 <div className="mb-4 flex items-center justify-between gap-4">
-                  <p className="font-display text-[19px]">{a.title}</p>
+                  <p className="font-display text-[21px]">{a.title}</p>
                   <form action={deleteActivityAction}>
                     <input type="hidden" name="id" value={a.id} />
                     <button className="inline-flex items-center gap-1.5 text-[12.5px] text-[#8a3a24] transition-opacity hover:opacity-70">
@@ -73,7 +73,7 @@ export default async function ContentPanel() {
 
         <div className="mt-6 shell">
           <div className="core p-5 sm:p-6">
-            <p className="font-display text-[19px]">Nueva experiencia</p>
+            <p className="font-display text-[21px]">Nueva experiencia</p>
             <SaveForm action={saveActivityAction} label="Crear" className="mt-4 space-y-3">
               <div className="grid gap-3 sm:grid-cols-3">
                 <Field label="Título"><input name="title" required className={inputCx} /></Field>

@@ -42,7 +42,7 @@ export default function Hero({ eyebrow, title, subtitle }: { eyebrow: string; ti
             </div>
           </div>
 
-          <h1 className="mt-6 max-w-4xl font-display text-[clamp(2.6rem,8.2vw,6.2rem)] leading-[0.95] text-cream">
+          <h1 className="mt-6 max-w-4xl font-display text-[clamp(2.9rem,9vw,6.9rem)] leading-[0.95] text-cream">
             {lines.map((l, i) => (
               <span key={i} className="line-mask">
                 <span style={{ transitionDelay: `${140 + i * 120}ms` }}>{l}</span>

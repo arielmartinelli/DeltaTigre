@@ -24,7 +24,7 @@ export default async function PanelHome() {
           <Reveal key={l as string} delay={i * 70} className="shell">
             <div className="core px-5 py-6">
               <Icon name={ic as string} className="h-5 w-5 text-palm" />
-              <p className="mt-4 display text-[clamp(1.5rem,3vw,2rem)] leading-none">{n}</p>
+              <p className="mt-4 display text-[clamp(1.7rem,3.4vw,2.2rem)] leading-none">{n}</p>
               <p className="mt-1.5 text-[12.5px] text-ink-45">{l as string}</p>
             </div>
           </Reveal>

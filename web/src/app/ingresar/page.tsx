@@ -12,7 +12,7 @@ export default async function LoginPage() {
   return (
     <AuthShell
       eyebrow="Tu cuenta"
-      title={<>Bienvenido<br /><span className="italic text-palm-deep">de vuelta</span></>}
+      title={<>Bienvenido<br /><span className="script script-verde">de vuelta</span></>}
       subtitle="Ingresá para solicitar reservas y seguir el estado de tus solicitudes."
       image="/img/delta-dos/13.webp"
     >

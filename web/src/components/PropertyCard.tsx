@@ -45,7 +45,7 @@ export default function PropertyCard({
 
           <div className="flex flex-col gap-5 px-6 pb-6 pt-6 sm:px-7">
             <div>
-              <h3 className="display text-[clamp(1.6rem,3vw,2.1rem)] leading-[1.1]">{p.name}</h3>
+              <h3 className="display text-[clamp(1.8rem,3.4vw,2.35rem)] leading-[1.1]">{p.name}</h3>
               <p className="mt-2 max-w-md text-[14.5px] leading-relaxed text-ink-45">{p.tagline}</p>
             </div>
 
@@ -58,7 +58,7 @@ export default function PropertyCard({
 
             <div className="flex items-end justify-between gap-4 border-t border-ink/8 pt-5">
               <p className="text-[13px] text-ink-45">
-                <span className="display text-[22px] text-ink">{money(p.basePrice, p.currency)}</span>
+                <span className="display text-[25px] text-ink">{money(p.basePrice, p.currency)}</span>
                 <span className="ml-1.5">/ noche</span>
               </p>
               <span className="inline-flex items-center gap-2 text-[13px] font-medium text-ink">

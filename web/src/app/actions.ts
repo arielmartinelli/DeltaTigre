@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -11,7 +11,7 @@ import { db, schema } from "@/lib/db";
 import { createSession, destroySession, getSession } from "@/lib/session";
 import { uid, nightsBetween, bookingCode, money, prettyDate, rangesOverlap, isoToday } from "@/lib/utils";
 import { waLink, requestMessage, replyMessage } from "@/lib/whatsapp";
-import { getBusyRanges } from "@/lib/data";
+import { getBusyRanges, TAG_CONTENIDO, TAG_RESERVAS } from "@/lib/data";
 
 export type State = { ok?: boolean; error?: string; message?: string; waUrl?: string; code?: string };
 
@@ -123,6 +123,7 @@ export async function createBookingAction(_prev: State, form: FormData): Promise
     estimate: money(estimate, property.currency), message: message ?? "",
   });
 
+  revalidateTag(TAG_RESERVAS);
   revalidatePath("/mi-cuenta");
   revalidatePath("/panel");
   return { ok: true, code, waUrl: waLink(ownerPhone, text), message: "Solicitud registrada" };
@@ -136,6 +137,7 @@ export async function cancelBookingAction(formData: FormData) {
   if (!b || b.userId !== session.id) throw new Error("No autorizado");
   await db.update(schema.bookings).set({ status: "cancelada", updatedAt: Date.now() })
     .where(eq(schema.bookings.id, id));
+  revalidateTag(TAG_RESERVAS);
   revalidatePath("/mi-cuenta");
   revalidatePath("/panel");
 }
@@ -174,6 +176,7 @@ export async function replyBookingAction(_prev: State, form: FormData): Promise<
     checkIn: prettyDate(b.checkIn), checkOut: prettyDate(b.checkOut), reply,
   });
 
+  revalidateTag(TAG_RESERVAS);
   revalidatePath("/panel");
   revalidatePath("/mi-cuenta");
   return {
@@ -202,6 +205,7 @@ export async function updatePropertyAction(_prev: State, form: FormData): Promis
     active: form.get("active") ? 1 : 0,
   }).where(eq(schema.properties.id, id));
 
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
   return { ok: true, message: "Cambios guardados" };
 }
@@ -217,18 +221,21 @@ export async function addAmenityAction(form: FormData) {
     label, icon: String(form.get("icon") ?? "check"),
     featured: form.get("featured") ? 1 : 0, sortOrder: 999,
   });
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }
 
 export async function deleteAmenityAction(form: FormData) {
   await assertOwner();
   await db.delete(schema.amenities).where(eq(schema.amenities.id, String(form.get("id"))));
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }
 
 export async function deleteImageAction(form: FormData) {
   await assertOwner();
   await db.delete(schema.images).where(eq(schema.images.id, String(form.get("id"))));
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }
 
@@ -245,6 +252,7 @@ export async function moveImageAction(form: FormData) {
   if (j < 0 || j >= list.length) return;
   await db.update(schema.images).set({ sortOrder: list[j].sortOrder }).where(eq(schema.images.id, list[i].id));
   await db.update(schema.images).set({ sortOrder: list[i].sortOrder }).where(eq(schema.images.id, list[j].id));
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }
 
@@ -252,6 +260,7 @@ export async function updateImageAltAction(form: FormData) {
   await assertOwner();
   await db.update(schema.images).set({ alt: String(form.get("alt") ?? "") })
     .where(eq(schema.images.id, String(form.get("id"))));
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }
 
@@ -313,6 +322,7 @@ export async function uploadImagesAction(_prev: State, form: FormData): Promise<
     }
   }
   if (!n) return { error: errors[0] ?? "Formato no permitido (JPG, PNG, WEBP o AVIF, hasta 8 MB)" };
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
   return { ok: true, message: `${n} imagen(es) subida(s)` };
 }
@@ -324,6 +334,7 @@ export async function updateSettingsAction(_prev: State, form: FormData): Promis
     await db.insert(schema.settings).values({ key, value })
       .onConflictDoUpdate({ target: schema.settings.key, set: { value } });
   }
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
   return { ok: true, message: "Contenido actualizado" };
 }
@@ -341,6 +352,7 @@ export async function saveActivityAction(_prev: State, form: FormData): Promise<
   };
   if (id) await db.update(schema.activities).set(values).where(eq(schema.activities.id, id));
   else await db.insert(schema.activities).values({ id: uid(), ...values });
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
   return { ok: true, message: "Experiencia guardada" };
 }
@@ -348,6 +360,7 @@ export async function saveActivityAction(_prev: State, form: FormData): Promise<
 export async function deleteActivityAction(form: FormData) {
   await assertOwner();
   await db.delete(schema.activities).where(eq(schema.activities.id, String(form.get("id"))));
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }
 
@@ -360,11 +373,13 @@ export async function addBlockAction(form: FormData) {
     id: uid(), propertyId: String(form.get("propertyId")),
     fromDate: from, toDate: to, reason: String(form.get("reason") ?? "Bloqueo manual"),
   });
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }
 
 export async function deleteBlockAction(form: FormData) {
   await assertOwner();
   await db.delete(schema.blocks).where(eq(schema.blocks.id, String(form.get("id"))));
+  revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }

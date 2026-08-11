@@ -69,7 +69,7 @@ export default function BookingForm({
       <div className="core p-6 sm:p-7">
         <div className="flex items-baseline justify-between gap-3">
           <p>
-            <span className="display text-[28px] leading-none">{money(property.basePrice, property.currency)}</span>
+            <span className="display text-[31px] leading-none">{money(property.basePrice, property.currency)}</span>
             <span className="ml-1.5 text-[13px] text-ink-45">/ noche</span>
           </p>
           <span className="tag bg-palm-wash text-palm-deep">min. {property.minNights} noches</span>

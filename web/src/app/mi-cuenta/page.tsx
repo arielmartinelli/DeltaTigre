@@ -76,7 +76,7 @@ export default async function AccountPage() {
                               <StatusPill status={b.status} />
                               <span className="text-[11.5px] tabular-nums text-ink-45">{b.code}</span>
                             </div>
-                            <h3 className="mt-2.5 font-display text-[21px]">{p?.name ?? "Alojamiento"}</h3>
+                            <h3 className="mt-2.5 font-display text-[23px]">{p?.name ?? "Alojamiento"}</h3>
                             <p className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13.5px] text-ink-45">
                               <span className="inline-flex items-center gap-1.5"><Icon name="cal" className="h-3.5 w-3.5" />{prettyDate(b.checkIn)} → {prettyDate(b.checkOut)}</span>
                               <span className="inline-flex items-center gap-1.5"><Icon name="users" className="h-3.5 w-3.5" />{b.adults + b.children}</span>
@@ -90,7 +90,7 @@ export default async function AccountPage() {
                             )}
                           </div>
                           <div className="flex shrink-0 flex-row items-center justify-between gap-4 sm:flex-col sm:items-end">
-                            <p className="display text-[20px]">{money(b.estimate, p?.currency ?? "ARS")}</p>
+                            <p className="display text-[22px]">{money(b.estimate, p?.currency ?? "ARS")}</p>
                             {(b.status === "pendiente" || b.status === "confirmada") && (
                               <form action={cancelBookingAction}>
                                 <input type="hidden" name="id" value={b.id} />

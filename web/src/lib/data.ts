@@ -1,5 +1,20 @@
+import { unstable_cache } from "next/cache";
 import { db, schema, run } from "./db";
 import { eq, asc, desc, and, inArray } from "drizzle-orm";
+
+/**
+ * La base esta en otra region, asi que cada consulta cuesta latencia.
+ * El contenido publico cambia solo desde el panel: se cachea y se invalida
+ * por etiqueta cuando el propietario edita algo.
+ */
+export const TAG_CONTENIDO = "contenido";
+export const TAG_RESERVAS = "reservas";
+
+function cache<A extends unknown[], R>(
+  fn: (...args: A) => Promise<R>, clave: string, tags: string[], revalidate = 3600
+) {
+  return unstable_cache(fn, [clave], { tags, revalidate });
+}
 
 export type Property = typeof schema.properties.$inferSelect;
 export type Amenity = typeof schema.amenities.$inferSelect;
@@ -8,16 +23,16 @@ export type Rule = typeof schema.rules.$inferSelect;
 export type Booking = typeof schema.bookings.$inferSelect;
 export type Activity = typeof schema.activities.$inferSelect;
 
-export async function getSettings() {
+async function _getSettings() {
   const rows = await run(() => db.select().from(schema.settings), "settings");
   return Object.fromEntries(rows.map((r) => [r.key, r.value])) as Record<string, string>;
 }
 
-export async function getProperties() {
+async function _getProperties() {
   return run(() => db.select().from(schema.properties).orderBy(asc(schema.properties.sortOrder)), "properties");
 }
 
-export async function getActiveProperties() {
+async function _getActiveProperties() {
   return run(
     () => db.select().from(schema.properties)
       .where(eq(schema.properties.active, 1))
@@ -26,7 +41,7 @@ export async function getActiveProperties() {
   );
 }
 
-export async function getPropertyBySlug(slug: string) {
+async function _getPropertyBySlug(slug: string) {
   const r = await run(
     () => db.select().from(schema.properties).where(eq(schema.properties.slug, slug)).limit(1),
     "property por slug"
@@ -34,7 +49,7 @@ export async function getPropertyBySlug(slug: string) {
   return r[0] ?? null;
 }
 
-export async function getPropertyById(id: string) {
+async function _getPropertyById(id: string) {
   const r = await run(
     () => db.select().from(schema.properties).where(eq(schema.properties.id, id)).limit(1),
     "property por id"
@@ -42,7 +57,7 @@ export async function getPropertyById(id: string) {
   return r[0] ?? null;
 }
 
-export async function getImages(propertyId: string) {
+async function _getImages(propertyId: string) {
   return run(
     () => db.select().from(schema.images)
       .where(eq(schema.images.propertyId, propertyId))
@@ -51,7 +66,7 @@ export async function getImages(propertyId: string) {
   );
 }
 
-export async function getCovers(ids: string[]) {
+async function _getCovers(ids: string[]) {
   if (!ids.length) return {} as Record<string, Img[]>;
   const all = await run(
     () => db.select().from(schema.images)
@@ -64,7 +79,7 @@ export async function getCovers(ids: string[]) {
   return map;
 }
 
-export async function getAmenities(propertyId: string) {
+async function _getAmenities(propertyId: string) {
   return run(
     () => db.select().from(schema.amenities)
       .where(eq(schema.amenities.propertyId, propertyId))
@@ -73,7 +88,7 @@ export async function getAmenities(propertyId: string) {
   );
 }
 
-export async function getRules(propertyId: string) {
+async function _getRules(propertyId: string) {
   return run(
     () => db.select().from(schema.rules)
       .where(eq(schema.rules.propertyId, propertyId))
@@ -82,15 +97,15 @@ export async function getRules(propertyId: string) {
   );
 }
 
-export async function getNearby() {
+async function _getNearby() {
   return run(() => db.select().from(schema.nearby).orderBy(asc(schema.nearby.sortOrder)), "nearby");
 }
 
-export async function getActivities() {
+async function _getActivities() {
   return run(() => db.select().from(schema.activities).orderBy(asc(schema.activities.sortOrder)), "activities");
 }
 
-export async function getBlocks(propertyId: string) {
+async function _getBlocks(propertyId: string) {
   return run(() => db.select().from(schema.blocks).where(eq(schema.blocks.propertyId, propertyId)), "blocks");
 }
 
@@ -116,14 +131,14 @@ export async function getBooking(id: string) {
 }
 
 /** Fechas ocupadas (reservas confirmadas + bloqueos manuales) */
-export async function getBusyRanges(propertyId: string) {
+async function _getBusyRanges(propertyId: string) {
   const [confirmed, manual] = await Promise.all([
     run(
       () => db.select().from(schema.bookings)
         .where(and(eq(schema.bookings.propertyId, propertyId), eq(schema.bookings.status, "confirmada"))),
       "reservas confirmadas"
     ),
-    getBlocks(propertyId),
+    _getBlocks(propertyId),
   ]);
   return [
     ...confirmed.map((b) => ({ from: b.checkIn, to: b.checkOut, reason: "Reservada" })),
@@ -142,3 +157,19 @@ export function groupAmenities(list: Amenity[]) {
   }
   return { featured, groups };
 }
+
+
+/* ---- Lecturas publicas, cacheadas por etiqueta ---- */
+export const getSettings = cache(_getSettings, "getSettings", [TAG_CONTENIDO]);
+export const getProperties = cache(_getProperties, "getProperties", [TAG_CONTENIDO]);
+export const getActiveProperties = cache(_getActiveProperties, "getActiveProperties", [TAG_CONTENIDO]);
+export const getPropertyBySlug = cache(_getPropertyBySlug, "getPropertyBySlug", [TAG_CONTENIDO]);
+export const getPropertyById = cache(_getPropertyById, "getPropertyById", [TAG_CONTENIDO]);
+export const getImages = cache(_getImages, "getImages", [TAG_CONTENIDO]);
+export const getCovers = cache(_getCovers, "getCovers", [TAG_CONTENIDO]);
+export const getAmenities = cache(_getAmenities, "getAmenities", [TAG_CONTENIDO]);
+export const getRules = cache(_getRules, "getRules", [TAG_CONTENIDO]);
+export const getNearby = cache(_getNearby, "getNearby", [TAG_CONTENIDO]);
+export const getActivities = cache(_getActivities, "getActivities", [TAG_CONTENIDO]);
+export const getBlocks = cache(_getBlocks, "getBlocks", [TAG_RESERVAS]);
+export const getBusyRanges = cache(_getBusyRanges, "getBusyRanges", [TAG_RESERVAS]);

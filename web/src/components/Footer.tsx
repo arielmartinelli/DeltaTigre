@@ -13,7 +13,7 @@ export default function Footer({ wa, email, instagram }: { wa: string; email: st
               <span className="grid h-16 w-16 place-items-center overflow-hidden rounded-full bg-cream">
                 <Image src="/brand/logo.webp" alt="Delta Tigre" width={128} height={128} className="h-full w-full object-cover" />
               </span>
-              <span className="display text-3xl">Delta Tigre</span>
+              <span className="script text-[42px] leading-none">Delta Tigre</span>
             </div>
             <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-cream/55">
               Dos casas de madera sobre el Arroyo Gambado, primera seccion del Delta de Tigre.

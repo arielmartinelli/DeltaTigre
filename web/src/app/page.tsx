@@ -33,7 +33,7 @@ export default async function Home() {
               ["100 m", "a restaurantes y bar"],
             ].map(([n, l]) => (
               <div key={l} className="px-6 py-8 text-center">
-                <p className="display text-[clamp(1.8rem,4vw,2.6rem)] leading-none">{n}</p>
+                <p className="display text-[clamp(2rem,4.4vw,2.9rem)] leading-none">{n}</p>
                 <p className="mt-2 text-[12.5px] text-ink-45">{l}</p>
               </div>
             ))}
@@ -47,9 +47,9 @@ export default async function Home() {
           <div className="md:col-span-5">
             <Reveal>
               <Eyebrow>{settings.about_title ?? "El lugar"}</Eyebrow>
-              <h2 className="mt-6 font-display text-[clamp(2.1rem,5vw,3.6rem)] leading-[1.02]">
+              <h2 className="mt-6 font-display text-[clamp(2.35rem,5.5vw,4rem)] leading-[1.02]">
                 Se llega en lancha.<br />
-                <span className="italic text-palm-deep">Se vuelve distinto.</span>
+                <span className="script script-verde">Se vuelve distinto</span>
               </h2>
               <p className="mt-7 max-w-md text-[16px] leading-relaxed text-ink-70">{settings.about_body}</p>
               <div className="mt-9 space-y-4">
@@ -98,7 +98,7 @@ export default async function Home() {
         <Reveal className="mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Eyebrow>Alojamientos</Eyebrow>
-            <h2 className="mt-5 max-w-lg font-display text-[clamp(2.1rem,5vw,3.6rem)] leading-[1.02]">
+            <h2 className="mt-5 max-w-lg font-display text-[clamp(2.35rem,5.5vw,4rem)] leading-[1.02]">
               Dos casas, un mismo arroyo
             </h2>
           </div>
@@ -122,8 +122,8 @@ export default async function Home() {
           <Reveal className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <Eyebrow dark>Experiencias</Eyebrow>
-              <h2 className="mt-5 max-w-lg font-display text-[clamp(2.1rem,5vw,3.6rem)] leading-[1.02]">
-                Que hacer <span className="italic text-palm-soft">alrededor</span>
+              <h2 className="mt-5 max-w-lg font-display text-[clamp(2.35rem,5.5vw,4rem)] leading-[1.02]">
+                Que hacer <span className="script text-palm-soft">alrededor</span>
               </h2>
             </div>
             <CTA href="/experiencias" variant="outline" className="!text-cream !shadow-[inset_0_0_0_1px_rgba(251,250,243,0.28)] hover:!bg-cream hover:!text-ink">
@@ -141,7 +141,7 @@ export default async function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/25 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6">
                 <span className="tag bg-cream/12 text-cream/75">{a.tag}</span>
-                <h3 className="mt-3 font-display text-[26px] leading-tight">{a.title}</h3>
+                <h3 className="mt-3 font-display text-[29px] leading-tight">{a.title}</h3>
                 <p className="mt-2 max-h-0 overflow-hidden text-[13.5px] leading-relaxed text-cream/70 opacity-0 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:max-h-24 group-hover:opacity-100">
                   {a.summary}
                 </p>
@@ -156,8 +156,8 @@ export default async function Home() {
         <div className="grid gap-12 md:grid-cols-12">
           <Reveal className="md:col-span-4">
             <Eyebrow>Alrededores</Eyebrow>
-            <h2 className="mt-5 font-display text-[clamp(2rem,4.6vw,3.2rem)] leading-[1.03]">
-              Todo cerca,<br /><span className="italic text-palm-deep">nada encima</span>
+            <h2 className="mt-5 font-display text-[clamp(2.25rem,5.1vw,3.6rem)] leading-[1.03]">
+              Todo cerca,<br /><span className="script script-verde">nada encima</span>
             </h2>
             <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-ink-70">
               A 2,2 km del Parque de la Costa y del casco historico de Tigre, con restaurantes a cien metros del muelle.
@@ -198,7 +198,7 @@ export default async function Home() {
             <div className="absolute inset-0 -z-10 bg-ink/62" />
             <div className="flex flex-col items-center gap-7 px-6 py-24 text-center md:py-32">
               <Eyebrow dark>Reservas</Eyebrow>
-              <h2 className="max-w-2xl font-display text-[clamp(2.2rem,5.4vw,3.8rem)] leading-[1.02] text-cream">
+              <h2 className="max-w-2xl font-display text-[clamp(2.45rem,6vw,4.2rem)] leading-[1.02] text-cream">
                 Contanos que fin de semana tenes en mente
               </h2>
               <p className="max-w-md text-[15.5px] leading-relaxed text-cream/70">
