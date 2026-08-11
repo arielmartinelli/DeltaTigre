@@ -38,3 +38,4 @@ export default async function CabanasPage() {
 }
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 25;

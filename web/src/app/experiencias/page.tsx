@@ -67,3 +67,4 @@ export default async function ExperienciasPage() {
 }
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 25;

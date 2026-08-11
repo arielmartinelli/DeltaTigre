@@ -117,3 +117,4 @@ export default async function AccountPage() {
 }
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 25;

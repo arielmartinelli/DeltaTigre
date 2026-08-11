@@ -68,3 +68,4 @@ export default async function PanelHome() {
 }
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 25;

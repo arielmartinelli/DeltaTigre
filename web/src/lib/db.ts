@@ -24,11 +24,13 @@ const g = globalThis as unknown as { __deltaSql?: ReturnType<typeof postgres> };
 export const sql =
   g.__deltaSql ??
   postgres(url, {
-    prepare: false,        // requerido por el pooler en modo transaction
-    ssl: "require",
-    max: 3,
+    prepare: false,                       // requerido por el pooler en modo transaction
+    ssl: { rejectUnauthorized: false },   // el pooler presenta un certificado propio
+    max: 2,
     idle_timeout: 20,
-    connect_timeout: 15,
+    connect_timeout: 10,
+    max_lifetime: 60 * 5,
+    onnotice: () => {},
   });
 
 if (process.env.NODE_ENV !== "production") g.__deltaSql = sql;
@@ -39,3 +41,17 @@ export { schema };
 
 /** El esquema ya existe en Supabase (drizzle/supabase.sql). Se mantiene por compatibilidad. */
 export async function ensureSchema(): Promise<void> {}
+
+
+/** Corta cualquier consulta colgada para que el error sea visible y no un 504. */
+export async function withTimeout<T>(p: Promise<T>, ms = 12000, label = "consulta"): Promise<T> {
+  let t: NodeJS.Timeout;
+  const guard = new Promise<never>((_, rej) => {
+    t = setTimeout(() => rej(new Error(`Timeout de ${ms} ms en ${label}. Revisá DATABASE_URL y la region de Supabase.`)), ms);
+  });
+  try {
+    return await Promise.race([p, guard]);
+  } finally {
+    clearTimeout(t!);
+  }
+}
