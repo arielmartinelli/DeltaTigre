@@ -21,7 +21,7 @@ export default async function EditProperty({ params }: { params: Promise<{ id: s
   return (
     <div className="space-y-16">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-display text-[clamp(1.8rem,4vw,2.7rem)]">{p.name}</h2>
+        <h2 className="font-display text-[clamp(1.6rem,3.6vw,2.4rem)]">{p.name}</h2>
         <Link href={`/cabanas/${p.slug}`} target="_blank" className="ul-slide text-[13px] text-ink-45 hover:text-ink">Ver publicada ↗</Link>
       </div>
 

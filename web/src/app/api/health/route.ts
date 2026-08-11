@@ -10,7 +10,24 @@ export async function GET() {
   // Solo el propietario ve el detalle; para el resto es un ping mudo.
   const session = await getSession();
   if (session?.role !== "owner") {
-    return NextResponse.json({ ok: true }, { status: 200 });
+    // Sin sesion de propietario solo se informa lo minimo para diagnosticar el login.
+    try {
+      const owners = await withTimeout(
+        raw`select count(*)::int as n from users where role = 'owner'`, 8000, "owners"
+      );
+      const total = await withTimeout(raw`select count(*)::int as n from users`, 8000, "users");
+      return NextResponse.json({
+        ok: true,
+        sesion: session ? `iniciada como ${session.role}` : "sin sesion",
+        cuentasPropietario: owners[0].n,
+        cuentasTotales: total[0].n,
+      });
+    } catch (e) {
+      return NextResponse.json(
+        { ok: false, error: e instanceof Error ? e.message : String(e) },
+        { status: 500 }
+      );
+    }
   }
 
   const url = process.env.DATABASE_URL ?? "";

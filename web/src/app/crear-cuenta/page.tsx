@@ -12,7 +12,7 @@ export default async function RegisterPage() {
   return (
     <AuthShell
       eyebrow="Nueva cuenta"
-      title={<>Creá tu cuenta<br /><span className="script script-verde">y reservá</span></>}
+      title={<>Creá tu cuenta<br /><span className="italic text-palm-deep">y reservá</span></>}
       subtitle="Con una cuenta podés pedir fechas, ver el estado de tus solicitudes y recibir la respuesta del propietario acá y por WhatsApp."
       image="/img/delta-uno/04.webp"
     >

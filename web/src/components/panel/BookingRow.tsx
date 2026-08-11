@@ -37,7 +37,7 @@ export default function BookingRow({ b, propertyName }: { b: B; propertyName: st
             </span>
           </span>
           <span className="hidden shrink-0 text-right sm:block">
-            <span className="display block text-[21px]">{money(b.estimate)}</span>
+            <span className="display block text-[19px]">{money(b.estimate)}</span>
           </span>
           <Icon name="arrow" className={`h-4 w-4 shrink-0 text-ink-45 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${open ? "-rotate-90" : "rotate-90"}`} />
         </button>

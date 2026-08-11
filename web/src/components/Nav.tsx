@@ -45,7 +45,7 @@ export default function Nav({ user }: { user: SessionUser | null }) {
             <span className="relative grid h-12 w-12 place-items-center overflow-hidden rounded-full bg-paper hairline transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105">
               <Image src="/brand/logo.webp" alt="Delta Tigre" width={96} height={96} className="h-full w-full object-cover" priority />
             </span>
-            <span className="script text-[26px] leading-none">Delta Tigre</span>
+            <span className="display text-[19px] leading-none">Delta Tigre</span>
           </Link>
 
           <div className="ml-auto hidden items-center gap-1 md:flex">

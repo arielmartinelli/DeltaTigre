@@ -17,8 +17,8 @@ export default async function CabanasPage() {
     <div className="mx-auto max-w-6xl px-5 pb-24 pt-36 md:px-8 md:pt-44">
       <Reveal className="max-w-3xl">
         <Eyebrow>Alojamientos</Eyebrow>
-        <h1 className="mt-6 font-display text-[clamp(2.7rem,7.2vw,5.1rem)] leading-[0.98]">
-          Elegí tu casa<br /><span className="script script-verde">sobre el arroyo</span>
+        <h1 className="mt-6 font-display text-[clamp(2.4rem,6.5vw,4.6rem)] leading-[0.98]">
+          Elegí tu casa<br /><span className="italic text-palm-deep">sobre el arroyo</span>
         </h1>
         <p className="mt-7 max-w-xl text-[16px] leading-relaxed text-ink-70">
           Las dos están sobre el mismo brazo del Arroyo Gambado, a metros una de la otra. Se alquilan por separado

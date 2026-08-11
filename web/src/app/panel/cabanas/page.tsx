@@ -25,7 +25,7 @@ export default async function PanelProperties() {
             </div>
             <div className="flex items-end justify-between gap-4 p-6">
               <div>
-                <h2 className="font-display text-[27px]">{p.name}</h2>
+                <h2 className="font-display text-[24px]">{p.name}</h2>
                 <p className="mt-1.5 text-[13.5px] text-ink-45">
                   {money(p.basePrice)} / noche · {covers[p.id]?.length ?? 0} fotos
                 </p>

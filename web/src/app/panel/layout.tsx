@@ -23,7 +23,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       <header className="flex flex-col gap-6 border-b border-ink/8 pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <span className="tag bg-palm-wash text-palm-deep"><span className="h-1 w-1 rounded-full bg-palm" />Panel del propietario</span>
-          <h1 className="mt-4 font-display text-[clamp(2.15rem,5.1vw,3.35rem)] leading-none">Delta Tigre</h1>
+          <h1 className="mt-4 font-display text-[clamp(1.9rem,4.6vw,3rem)] leading-none">Delta Tigre</h1>
         </div>
         <div className="flex items-center gap-5">
           <Link href="/" className="ul-slide text-[13px] text-ink-45 hover:text-ink">Ver el sitio</Link>
