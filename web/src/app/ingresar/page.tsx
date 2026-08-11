@@ -18,7 +18,8 @@ export default async function LoginPage() {
     >
       <AuthForm mode="login" />
       <p className="mt-6 border-t border-ink/8 pt-5 text-center text-[12.5px] leading-relaxed text-ink-45">
-        ¿Sos el propietario? Ingresá con tu email y entrás directo al panel de reservas.
+        ¿Sos el propietario?{" "}
+        <a href="/propietario" className="ul-slide text-ink">Entrá por el acceso del panel</a>.
       </p>
     </AuthShell>
   );

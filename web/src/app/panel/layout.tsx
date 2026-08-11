@@ -15,7 +15,7 @@ const tabs = [
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
-  if (!session) redirect("/ingresar");
+  if (!session) redirect("/propietario");
   if (session.role !== "owner") redirect("/mi-cuenta");
 
   return (

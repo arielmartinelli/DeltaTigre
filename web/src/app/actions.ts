@@ -58,6 +58,23 @@ export async function loginAction(_prev: State, form: FormData): Promise<State> 
   redirect(user.role === "owner" ? "/panel" : "/mi-cuenta");
 }
 
+/** Acceso exclusivo del propietario. Rechaza cuentas de huesped. */
+export async function loginOwnerAction(_prev: State, form: FormData): Promise<State> {
+  const email = String(form.get("email") ?? "").trim().toLowerCase();
+  const password = String(form.get("password") ?? "");
+  if (!email || !password) return { error: "Completa email y contrasena" };
+
+  const user = await one(db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1));
+  if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
+    return { error: "Email o contrasena incorrectos" };
+  }
+  if (user.role !== "owner") {
+    return { error: "Esa cuenta es de huesped. Ingresa desde el acceso de huespedes." };
+  }
+  await createSession({ id: user.id, name: user.name, email: user.email, role: "owner" });
+  redirect("/panel");
+}
+
 export async function logoutAction() {
   await destroySession();
   redirect("/");

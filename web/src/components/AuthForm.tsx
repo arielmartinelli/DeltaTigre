@@ -1,13 +1,13 @@
 "use client";
 import Link from "next/link";
 import { useActionState } from "react";
-import { loginAction, registerAction, type State } from "@/app/actions";
+import { loginAction, loginOwnerAction, registerAction, type State } from "@/app/actions";
 import { ActionButton } from "./Button";
 import { Field, inputCx } from "./Bits";
 
-export default function AuthForm({ mode }: { mode: "login" | "register" }) {
+export default function AuthForm({ mode }: { mode: "login" | "register" | "owner" }) {
   const [state, action, pending] = useActionState<State, FormData>(
-    mode === "login" ? loginAction : registerAction, {}
+    mode === "register" ? registerAction : mode === "owner" ? loginOwnerAction : loginAction, {}
   );
 
   return (
@@ -27,7 +27,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
       )}
       <Field label="Contraseña" hint={mode === "register" ? "Mínimo 8 caracteres" : undefined}>
         <input name="password" type="password" required minLength={mode === "register" ? 8 : 1}
-          autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="••••••••" className={inputCx} />
+          autoComplete={mode === "register" ? "new-password" : "current-password"} placeholder="••••••••" className={inputCx} />
       </Field>
 
       {state.error && (
@@ -35,14 +35,18 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
       )}
 
       <ActionButton type="submit" disabled={pending} className="w-full justify-between">
-        {pending ? "Un momento..." : mode === "login" ? "Ingresar" : "Crear mi cuenta"}
+        {pending ? "Un momento..." : mode === "register" ? "Crear mi cuenta" : mode === "owner" ? "Entrar al panel" : "Ingresar"}
       </ActionButton>
 
       <p className="pt-2 text-center text-[13px] text-ink-45">
-        {mode === "login" ? (
+        {mode === "login" && (
           <>¿No tenés cuenta? <Link href="/crear-cuenta" className="ul-slide text-ink">Creá una</Link></>
-        ) : (
+        )}
+        {mode === "register" && (
           <>¿Ya tenés cuenta? <Link href="/ingresar" className="ul-slide text-ink">Ingresá</Link></>
+        )}
+        {mode === "owner" && (
+          <>¿Sos huésped? <Link href="/ingresar" className="ul-slide text-ink">Entrá por acá</Link></>
         )}
       </p>
     </form>
