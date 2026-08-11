@@ -115,4 +115,4 @@ export default async function UbicacionPage() {
 }
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 25;
+export const maxDuration = 20;

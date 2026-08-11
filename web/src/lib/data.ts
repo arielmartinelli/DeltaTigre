@@ -1,4 +1,4 @@
-import { db, schema } from "./db";
+import { db, schema, run } from "./db";
 import { eq, asc, desc, and, inArray } from "drizzle-orm";
 
 export type Property = typeof schema.properties.$inferSelect;
@@ -9,91 +9,121 @@ export type Booking = typeof schema.bookings.$inferSelect;
 export type Activity = typeof schema.activities.$inferSelect;
 
 export async function getSettings() {
-  const rows = await db.select().from(schema.settings);
+  const rows = await run(() => db.select().from(schema.settings), "settings");
   return Object.fromEntries(rows.map((r) => [r.key, r.value])) as Record<string, string>;
 }
 
 export async function getProperties() {
-  return db.select().from(schema.properties).orderBy(asc(schema.properties.sortOrder));
+  return run(() => db.select().from(schema.properties).orderBy(asc(schema.properties.sortOrder)), "properties");
 }
 
 export async function getActiveProperties() {
-  return db.select().from(schema.properties)
-    .where(eq(schema.properties.active, 1))
-    .orderBy(asc(schema.properties.sortOrder));
+  return run(
+    () => db.select().from(schema.properties)
+      .where(eq(schema.properties.active, 1))
+      .orderBy(asc(schema.properties.sortOrder)),
+    "properties activas"
+  );
 }
 
 export async function getPropertyBySlug(slug: string) {
-  const r = await db.select().from(schema.properties).where(eq(schema.properties.slug, slug)).limit(1);
+  const r = await run(
+    () => db.select().from(schema.properties).where(eq(schema.properties.slug, slug)).limit(1),
+    "property por slug"
+  );
   return r[0] ?? null;
 }
 
 export async function getPropertyById(id: string) {
-  const r = await db.select().from(schema.properties).where(eq(schema.properties.id, id)).limit(1);
+  const r = await run(
+    () => db.select().from(schema.properties).where(eq(schema.properties.id, id)).limit(1),
+    "property por id"
+  );
   return r[0] ?? null;
 }
 
 export async function getImages(propertyId: string) {
-  return db.select().from(schema.images)
-    .where(eq(schema.images.propertyId, propertyId))
-    .orderBy(asc(schema.images.sortOrder));
+  return run(
+    () => db.select().from(schema.images)
+      .where(eq(schema.images.propertyId, propertyId))
+      .orderBy(asc(schema.images.sortOrder)),
+    "images"
+  );
 }
 
 export async function getCovers(ids: string[]) {
   if (!ids.length) return {} as Record<string, Img[]>;
-  const all = await db.select().from(schema.images)
-    .where(inArray(schema.images.propertyId, ids))
-    .orderBy(asc(schema.images.sortOrder));
+  const all = await run(
+    () => db.select().from(schema.images)
+      .where(inArray(schema.images.propertyId, ids))
+      .orderBy(asc(schema.images.sortOrder)),
+    "covers"
+  );
   const map: Record<string, Img[]> = {};
   for (const i of all) (map[i.propertyId] ??= []).push(i);
   return map;
 }
 
 export async function getAmenities(propertyId: string) {
-  return db.select().from(schema.amenities)
-    .where(eq(schema.amenities.propertyId, propertyId))
-    .orderBy(asc(schema.amenities.sortOrder));
+  return run(
+    () => db.select().from(schema.amenities)
+      .where(eq(schema.amenities.propertyId, propertyId))
+      .orderBy(asc(schema.amenities.sortOrder)),
+    "amenities"
+  );
 }
 
 export async function getRules(propertyId: string) {
-  return db.select().from(schema.rules)
-    .where(eq(schema.rules.propertyId, propertyId))
-    .orderBy(asc(schema.rules.sortOrder));
+  return run(
+    () => db.select().from(schema.rules)
+      .where(eq(schema.rules.propertyId, propertyId))
+      .orderBy(asc(schema.rules.sortOrder)),
+    "rules"
+  );
 }
 
 export async function getNearby() {
-  return db.select().from(schema.nearby).orderBy(asc(schema.nearby.sortOrder));
+  return run(() => db.select().from(schema.nearby).orderBy(asc(schema.nearby.sortOrder)), "nearby");
 }
 
 export async function getActivities() {
-  return db.select().from(schema.activities).orderBy(asc(schema.activities.sortOrder));
+  return run(() => db.select().from(schema.activities).orderBy(asc(schema.activities.sortOrder)), "activities");
 }
 
 export async function getBlocks(propertyId: string) {
-  return db.select().from(schema.blocks).where(eq(schema.blocks.propertyId, propertyId));
+  return run(() => db.select().from(schema.blocks).where(eq(schema.blocks.propertyId, propertyId)), "blocks");
 }
 
 export async function getBookingsForUser(userId: string) {
-  return db.select().from(schema.bookings)
-    .where(eq(schema.bookings.userId, userId))
-    .orderBy(desc(schema.bookings.createdAt));
+  return run(
+    () => db.select().from(schema.bookings)
+      .where(eq(schema.bookings.userId, userId))
+      .orderBy(desc(schema.bookings.createdAt)),
+    "bookings del usuario"
+  );
 }
 
 export async function getAllBookings() {
-  return db.select().from(schema.bookings).orderBy(desc(schema.bookings.createdAt));
+  return run(() => db.select().from(schema.bookings).orderBy(desc(schema.bookings.createdAt)), "bookings");
 }
 
 export async function getBooking(id: string) {
-  const r = await db.select().from(schema.bookings).where(eq(schema.bookings.id, id)).limit(1);
+  const r = await run(
+    () => db.select().from(schema.bookings).where(eq(schema.bookings.id, id)).limit(1),
+    "booking"
+  );
   return r[0] ?? null;
 }
 
 /** Fechas ocupadas (reservas confirmadas + bloqueos manuales) */
 export async function getBusyRanges(propertyId: string) {
   const [confirmed, manual] = await Promise.all([
-    db.select().from(schema.bookings)
-      .where(and(eq(schema.bookings.propertyId, propertyId), eq(schema.bookings.status, "confirmada"))),
-    db.select().from(schema.blocks).where(eq(schema.blocks.propertyId, propertyId)),
+    run(
+      () => db.select().from(schema.bookings)
+        .where(and(eq(schema.bookings.propertyId, propertyId), eq(schema.bookings.status, "confirmada"))),
+      "reservas confirmadas"
+    ),
+    getBlocks(propertyId),
   ]);
   return [
     ...confirmed.map((b) => ({ from: b.checkIn, to: b.checkOut, reason: "Reservada" })),

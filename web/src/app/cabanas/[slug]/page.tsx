@@ -254,4 +254,4 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
 }
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 25;
+export const maxDuration = 20;
