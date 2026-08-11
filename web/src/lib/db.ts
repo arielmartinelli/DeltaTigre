@@ -64,14 +64,23 @@ export async function resetConnection() {
  * Proxy hacia la instancia vigente: si `resetConnection` cambia el cliente,
  * todo el codigo que importa `db` sigue funcionando sin cambios.
  */
-export const db = new Proxy({} as Db, {
-  get: (_t, prop) => Reflect.get(dbRef as object, prop),
-}) as Db;
+function forward<T extends object>(target: () => T) {
+  return new Proxy(function () {} as unknown as T, {
+    get(_t, prop) {
+      const actual = target();
+      const value = Reflect.get(actual as object, prop);
+      // Los metodos se atan a la instancia real: si no, `this` seria el Proxy
+      // y drizzle/postgres.js fallan al leer su estado interno.
+      return typeof value === "function" ? value.bind(actual) : value;
+    },
+    has: (_t, prop) => Reflect.has(target() as object, prop),
+    apply: (_t, _this, args) =>
+      (target() as unknown as (...a: unknown[]) => unknown)(...args),
+  }) as T;
+}
 
-export const raw = new Proxy(function () {} as unknown as Sql, {
-  get: (_t, prop) => Reflect.get(sqlRef as object, prop),
-  apply: (_t, _this, args) => (sqlRef as unknown as (...a: unknown[]) => unknown)(...args),
-}) as Sql;
+export const db = forward<Db>(() => dbRef);
+export const raw = forward<Sql>(() => sqlRef);
 
 export { schema };
 
