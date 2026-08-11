@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 import { raw, withTimeout } from "@/lib/db";
+import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 20;
 
 /** Diagnostico: GET /api/health */
 export async function GET() {
+  // Solo el propietario ve el detalle; para el resto es un ping mudo.
+  const session = await getSession();
+  if (session?.role !== "owner") {
+    return NextResponse.json({ ok: true }, { status: 200 });
+  }
+
   const url = process.env.DATABASE_URL ?? "";
   const info = {
     tieneDatabaseUrl: !!url,

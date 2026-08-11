@@ -31,7 +31,13 @@ en el **SQL Editor** de Supabase. Ver [SUPABASE.md](./SUPABASE.md).
 |---|---|
 | `propietario@deltatigre.com.ar` | `DeltaTigre2026!` |
 
-> Cambiá esa contraseña antes de publicar el sitio.
+> **Cambiá esa contraseña antes de publicar el sitio**, porque figura en este archivo:
+>
+> ```bash
+> npm run owner -- propietario@deltatigre.com.ar "TuNuevaClave"
+> ```
+>
+> El mismo comando sirve para crear otro usuario propietario o recuperar el acceso.
 
 ### Variables de entorno (`.env`)
 
@@ -127,7 +133,7 @@ Para migrar la base a Supabase, ver **[SUPABASE.md](./SUPABASE.md)**.
 ### Antes de publicar
 
 - [ ] Cambiar `AUTH_SECRET` por una cadena aleatoria larga
-- [ ] Cambiar la contraseña del usuario propietario
+- [ ] Cambiar la contraseña del propietario con `npm run owner`
 - [ ] Poner el WhatsApp real en `.env` y en Panel → Contenido
 - [ ] Poner `NEXT_PUBLIC_SITE_URL` con el dominio real
 - [ ] Crear el bucket `fotos` en Supabase Storage y cargar `SUPABASE_SERVICE_ROLE_KEY`
