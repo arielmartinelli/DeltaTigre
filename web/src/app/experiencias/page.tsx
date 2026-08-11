@@ -65,3 +65,5 @@ export default async function ExperienciasPage() {
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";

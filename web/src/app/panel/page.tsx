@@ -66,3 +66,5 @@ export default async function PanelHome() {
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";

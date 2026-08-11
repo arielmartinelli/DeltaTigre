@@ -1,5 +1,6 @@
-import { db, raw, schema, ensureSchema } from "./db";
+import { db, raw, schema } from "./db";
 import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
 import { uid } from "./utils";
 
 
@@ -201,8 +202,15 @@ const IMG_DOS: [string, string][] = [
 ];
 
 async function main() {
-  await ensureSchema();
-  await raw.executeMultiple("DELETE FROM images; DELETE FROM amenities; DELETE FROM rules; DELETE FROM nearby; DELETE FROM activities; DELETE FROM properties; DELETE FROM settings;");
+  await db.delete(schema.images);
+  await db.delete(schema.amenities);
+  await db.delete(schema.rules);
+  await db.delete(schema.nearby);
+  await db.delete(schema.activities);
+  await db.delete(schema.bookings);
+  await db.delete(schema.blocks);
+  await db.delete(schema.properties);
+  await db.delete(schema.settings);
 
   const unoId = "prop_delta_uno";
   const dosId = "prop_delta_dos";
@@ -261,7 +269,7 @@ async function main() {
   ]);
 
   const ownerEmail = "propietario@deltatigre.com.ar";
-  const exists = (await raw.execute({ sql: "SELECT id FROM users WHERE email = ?", args: [ownerEmail] })).rows[0];
+  const exists = (await db.select().from(schema.users).where(eq(schema.users.email, ownerEmail)).limit(1))[0];
   if (!exists) {
     await db.insert(schema.users).values({
       id: uid(), name: "Propietario Delta Tigre", email: ownerEmail, phone: "",
@@ -273,4 +281,6 @@ async function main() {
   console.log("Owner:", ownerEmail, "/ DeltaTigre2026!");
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main()
+  .then(async () => { await raw.end(); process.exit(0); })
+  .catch(async (e) => { console.error(e); await raw.end().catch(() => {}); process.exit(1); });

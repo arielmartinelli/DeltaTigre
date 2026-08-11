@@ -90,3 +90,5 @@ export default async function ContentPanel() {
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";

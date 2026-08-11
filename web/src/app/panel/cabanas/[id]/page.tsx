@@ -164,3 +164,5 @@ export default async function EditProperty({ params }: { params: Promise<{ id: s
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";

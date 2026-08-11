@@ -7,7 +7,7 @@ import { z } from "zod";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { eq } from "drizzle-orm";
-import { db, schema, ensureSchema } from "@/lib/db";
+import { db, schema } from "@/lib/db";
 import { createSession, destroySession, getSession } from "@/lib/session";
 import { uid, nightsBetween, bookingCode, money, prettyDate, rangesOverlap, isoToday } from "@/lib/utils";
 import { waLink, requestMessage, replyMessage } from "@/lib/whatsapp";
@@ -27,7 +27,6 @@ const registerSchema = z.object({
 });
 
 export async function registerAction(_prev: State, form: FormData): Promise<State> {
-  await ensureSchema();
   const parsed = registerSchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const { name, email, phone, password } = parsed.data;
@@ -47,7 +46,6 @@ export async function registerAction(_prev: State, form: FormData): Promise<Stat
 }
 
 export async function loginAction(_prev: State, form: FormData): Promise<State> {
-  await ensureSchema();
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   const password = String(form.get("password") ?? "");
   if (!email || !password) return { error: "Completa email y contrasena" };
@@ -80,7 +78,6 @@ const bookingSchema = z.object({
 export async function createBookingAction(_prev: State, form: FormData): Promise<State> {
   const session = await getSession();
   if (!session) return { error: "Necesitas una cuenta para solicitar la reserva.", code: "AUTH" };
-  await ensureSchema();
 
   const parsed = bookingSchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
@@ -148,7 +145,6 @@ export async function cancelBookingAction(formData: FormData) {
 async function assertOwner() {
   const s = await getSession();
   if (!s || s.role !== "owner") throw new Error("No autorizado");
-  await ensureSchema();
   return s;
 }
 
@@ -260,6 +256,35 @@ export async function updateImageAltAction(form: FormData) {
 }
 
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+const BUCKET = process.env.SUPABASE_BUCKET ?? "fotos";
+
+/** Sube a Supabase Storage si hay credenciales; si no, escribe en public/uploads (dev). */
+async function storeFile(file: File, name: string): Promise<string> {
+  const base = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const bytes = Buffer.from(await file.arrayBuffer());
+
+  if (base && key) {
+    const res = await fetch(`${base}/storage/v1/object/${BUCKET}/${name}`, {
+      method: "POST",
+      headers: {
+        // sirve tanto para las service_role clasicas como para las nuevas sb_secret_
+        Authorization: `Bearer ${key}`,
+        apikey: key,
+        "Content-Type": file.type,
+        "cache-control": "public, max-age=31536000",
+      },
+      body: new Uint8Array(bytes),
+    });
+    if (!res.ok) throw new Error(`Storage ${res.status}: ${await res.text()}`);
+    return `${base}/storage/v1/object/public/${BUCKET}/${name}`;
+  }
+
+  const dir = path.join(process.cwd(), "public", "uploads");
+  await fs.mkdir(dir, { recursive: true });
+  await fs.writeFile(path.join(dir, name), bytes);
+  return `/uploads/${name}`;
+}
 
 export async function uploadImagesAction(_prev: State, form: FormData): Promise<State> {
   await assertOwner();
@@ -267,26 +292,27 @@ export async function uploadImagesAction(_prev: State, form: FormData): Promise<
   const files = form.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
   if (!files.length) return { error: "Elegi al menos una imagen" };
 
-  const dir = path.join(process.cwd(), "public", "uploads");
-  await fs.mkdir(dir, { recursive: true });
-
   const existing = await db.select().from(schema.images).where(eq(schema.images.propertyId, propertyId));
   const max = existing.reduce((m, i) => Math.max(m, i.sortOrder), 0);
 
   let n = 0;
+  const errors: string[] = [];
   for (const file of files) {
     if (!ALLOWED.has(file.type)) continue;
     if (file.size > 8 * 1024 * 1024) continue;
     const ext = file.type.split("/")[1].replace("jpeg", "jpg");
-    const fname = `${uid()}.${ext}`;
-    await fs.writeFile(path.join(dir, fname), Buffer.from(await file.arrayBuffer()));
-    await db.insert(schema.images).values({
-      id: uid(), propertyId, url: `/uploads/${fname}`,
-      alt: String(form.get("alt") ?? "") || "Foto del alojamiento",
-      sortOrder: max + ++n,
-    });
+    try {
+      const url = await storeFile(file, `${uid()}.${ext}`);
+      await db.insert(schema.images).values({
+        id: uid(), propertyId, url,
+        alt: String(form.get("alt") ?? "") || "Foto del alojamiento",
+        sortOrder: max + ++n,
+      });
+    } catch (e) {
+      errors.push(e instanceof Error ? e.message : String(e));
+    }
   }
-  if (!n) return { error: "Formato no permitido (JPG, PNG, WEBP o AVIF, hasta 8 MB)" };
+  if (!n) return { error: errors[0] ?? "Formato no permitido (JPG, PNG, WEBP o AVIF, hasta 8 MB)" };
   revalidatePath("/", "layout");
   return { ok: true, message: `${n} imagen(es) subida(s)` };
 }

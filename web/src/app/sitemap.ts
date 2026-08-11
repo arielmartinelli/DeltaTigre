@@ -3,7 +3,8 @@ import { getActiveProperties } from "@/lib/data";
 const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const props = await getActiveProperties();
+  let props: Awaited<ReturnType<typeof getActiveProperties>> = [];
+  try { props = await getActiveProperties(); } catch {}
   const now = new Date();
   return [
     { url: base, lastModified: now, priority: 1 },

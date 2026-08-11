@@ -113,3 +113,5 @@ export default async function UbicacionPage() {
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";

@@ -9,13 +9,12 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx src/lib/seed.ts",
-    "reset": "rm -f data/delta.db && npm run seed"
+    "reset": "npm run seed"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@libsql/client": "^0.17.4",
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
     "date-fns": "^4.4.0",

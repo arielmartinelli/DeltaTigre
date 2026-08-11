@@ -1,8 +1,15 @@
 import type { NextConfig } from "next";
 
+import pathModule from "node:path";
+
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["@libsql/client", "libsql", "bcryptjs"],
-  images: { formats: ["image/avif", "image/webp"] },
+  // evita que Next tome la raiz del repo como workspace por lockfiles duplicados
+  outputFileTracingRoot: pathModule.join(process.cwd()),
+  serverExternalPackages: ["postgres", "bcryptjs"],
+  images: {
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [{ protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" }],
+  },
   poweredByHeader: false,
   async headers() {
     return [

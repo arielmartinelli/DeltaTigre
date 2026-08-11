@@ -36,3 +36,5 @@ export default async function CabanasPage() {
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";

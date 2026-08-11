@@ -4,10 +4,8 @@ Sitio estilo Airbnb/Booking para las dos casas de Delta Tigre, con cuentas de hu
 solicitudes de reserva que salen por WhatsApp y un panel del propietario para editar todo.
 
 Stack: **Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Drizzle ORM**
-Base de datos: **SQLite vía libsql en desarrollo → Postgres/Supabase en producción**.
-
-> El driver `@libsql/client` viene con binarios precompilados: **no hace falta Visual Studio
-> ni Python** para instalarlo, en ninguna versión de Node (18 a 24).
+Base de datos: **Postgres (Supabase)**, con el driver `postgres` en JS puro — no requiere
+compilador ni Visual Studio para instalarse.
 
 ---
 
@@ -15,9 +13,13 @@ Base de datos: **SQLite vía libsql en desarrollo → Postgres/Supabase en produ
 
 ```bash
 npm install
-npm run seed     # crea la base y carga las 2 casas, fotos, servicios y normas
+# copiá .env.example a .env y completá DATABASE_URL y AUTH_SECRET
+npm run seed     # carga las 2 casas, fotos, servicios, normas y el usuario propietario
 npm run dev      # http://localhost:3000
 ```
+
+El esquema de la base se crea una sola vez ejecutando `drizzle/supabase.sql`
+en el **SQL Editor** de Supabase. Ver [SUPABASE.md](./SUPABASE.md).
 
 > **Si el proyecto está dentro de OneDrive**: pausá la sincronización antes de `npm install`.
 > OneDrive intenta sincronizar los miles de archivos de `node_modules` y provoca errores
@@ -34,10 +36,21 @@ npm run dev      # http://localhost:3000
 ### Variables de entorno (`.env`)
 
 ```
-DATABASE_URL="file:./data/delta.db"
+DATABASE_URL="postgresql://postgres.XXXX:PASSWORD@aws-1-REGION.pooler.supabase.com:6543/postgres"
 AUTH_SECRET="cadena-larga-y-aleatoria-de-al-menos-32-caracteres"
 NEXT_PUBLIC_WHATSAPP="5491133334444"   # número del propietario, solo dígitos con código de país
 NEXT_PUBLIC_SITE_URL="https://deltatigre.com.ar"
+
+# Necesarias para que el panel pueda subir fotos en Vercel (disco de solo lectura)
+SUPABASE_URL="https://XXXX.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="..."
+SUPABASE_BUCKET="fotos"
+```
+
+Generar el secret:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 ```
 
 El WhatsApp también se puede cambiar sin tocar el código, desde **Panel → Contenido**.
@@ -117,8 +130,8 @@ Para migrar la base a Supabase, ver **[SUPABASE.md](./SUPABASE.md)**.
 - [ ] Cambiar la contraseña del usuario propietario
 - [ ] Poner el WhatsApp real en `.env` y en Panel → Contenido
 - [ ] Poner `NEXT_PUBLIC_SITE_URL` con el dominio real
-- [ ] Migrar a Supabase (ver SUPABASE.md)
-- [ ] Si el hosting tiene disco de solo lectura (Vercel), mover las fotos subidas a Supabase Storage
+- [ ] Crear el bucket `fotos` en Supabase Storage y cargar `SUPABASE_SERVICE_ROLE_KEY`
+- [ ] En Vercel, poner **Root Directory** en `web`
 
 ---
 

@@ -15,8 +15,12 @@ import {
 import { getSession } from "@/lib/session";
 
 export async function generateStaticParams() {
-  const props = await getActiveProperties();
-  return props.map((p) => ({ slug: p.slug }));
+  try {
+    const props = await getActiveProperties();
+    return props.map((p) => ({ slug: p.slug }));
+  } catch {
+    return []; // sin base disponible en build: se renderiza on-demand
+  }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -248,3 +252,5 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
     </>
   );
 }
+
+export const dynamic = "force-dynamic";

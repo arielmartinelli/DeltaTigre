@@ -1,4 +1,4 @@
-import { db, schema, ensureSchema } from "./db";
+import { db, schema } from "./db";
 import { eq, asc, desc, and, inArray } from "drizzle-orm";
 
 export type Property = typeof schema.properties.$inferSelect;
@@ -9,37 +9,31 @@ export type Booking = typeof schema.bookings.$inferSelect;
 export type Activity = typeof schema.activities.$inferSelect;
 
 export async function getSettings() {
-  await ensureSchema();
   const rows = await db.select().from(schema.settings);
   return Object.fromEntries(rows.map((r) => [r.key, r.value])) as Record<string, string>;
 }
 
 export async function getProperties() {
-  await ensureSchema();
   return db.select().from(schema.properties).orderBy(asc(schema.properties.sortOrder));
 }
 
 export async function getActiveProperties() {
-  await ensureSchema();
   return db.select().from(schema.properties)
     .where(eq(schema.properties.active, 1))
     .orderBy(asc(schema.properties.sortOrder));
 }
 
 export async function getPropertyBySlug(slug: string) {
-  await ensureSchema();
   const r = await db.select().from(schema.properties).where(eq(schema.properties.slug, slug)).limit(1);
   return r[0] ?? null;
 }
 
 export async function getPropertyById(id: string) {
-  await ensureSchema();
   const r = await db.select().from(schema.properties).where(eq(schema.properties.id, id)).limit(1);
   return r[0] ?? null;
 }
 
 export async function getImages(propertyId: string) {
-  await ensureSchema();
   return db.select().from(schema.images)
     .where(eq(schema.images.propertyId, propertyId))
     .orderBy(asc(schema.images.sortOrder));
@@ -47,7 +41,6 @@ export async function getImages(propertyId: string) {
 
 export async function getCovers(ids: string[]) {
   if (!ids.length) return {} as Record<string, Img[]>;
-  await ensureSchema();
   const all = await db.select().from(schema.images)
     .where(inArray(schema.images.propertyId, ids))
     .orderBy(asc(schema.images.sortOrder));
@@ -57,55 +50,46 @@ export async function getCovers(ids: string[]) {
 }
 
 export async function getAmenities(propertyId: string) {
-  await ensureSchema();
   return db.select().from(schema.amenities)
     .where(eq(schema.amenities.propertyId, propertyId))
     .orderBy(asc(schema.amenities.sortOrder));
 }
 
 export async function getRules(propertyId: string) {
-  await ensureSchema();
   return db.select().from(schema.rules)
     .where(eq(schema.rules.propertyId, propertyId))
     .orderBy(asc(schema.rules.sortOrder));
 }
 
 export async function getNearby() {
-  await ensureSchema();
   return db.select().from(schema.nearby).orderBy(asc(schema.nearby.sortOrder));
 }
 
 export async function getActivities() {
-  await ensureSchema();
   return db.select().from(schema.activities).orderBy(asc(schema.activities.sortOrder));
 }
 
 export async function getBlocks(propertyId: string) {
-  await ensureSchema();
   return db.select().from(schema.blocks).where(eq(schema.blocks.propertyId, propertyId));
 }
 
 export async function getBookingsForUser(userId: string) {
-  await ensureSchema();
   return db.select().from(schema.bookings)
     .where(eq(schema.bookings.userId, userId))
     .orderBy(desc(schema.bookings.createdAt));
 }
 
 export async function getAllBookings() {
-  await ensureSchema();
   return db.select().from(schema.bookings).orderBy(desc(schema.bookings.createdAt));
 }
 
 export async function getBooking(id: string) {
-  await ensureSchema();
   const r = await db.select().from(schema.bookings).where(eq(schema.bookings.id, id)).limit(1);
   return r[0] ?? null;
 }
 
 /** Fechas ocupadas (reservas confirmadas + bloqueos manuales) */
 export async function getBusyRanges(propertyId: string) {
-  await ensureSchema();
   const [confirmed, manual] = await Promise.all([
     db.select().from(schema.bookings)
       .where(and(eq(schema.bookings.propertyId, propertyId), eq(schema.bookings.status, "confirmada"))),

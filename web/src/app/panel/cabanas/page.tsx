@@ -40,3 +40,5 @@ export default async function PanelProperties() {
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";
