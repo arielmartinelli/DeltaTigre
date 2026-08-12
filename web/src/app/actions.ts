@@ -8,10 +8,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { createSession, destroySession, getGuestSession, getOwnerSession } from "@/lib/session";
-import { uid, nightsBetween, bookingCode, money, prettyDate, rangesOverlap, isoToday } from "@/lib/utils";
-import { waLink, requestMessage, replyMessage } from "@/lib/whatsapp";
-import { getBusyRanges, TAG_CONTENIDO, TAG_RESERVAS } from "@/lib/data";
+import { createSession, destroySession, getOwnerSession } from "@/lib/session";
+import { uid, nightsBetween, bookingCode, money, prettyDate, rangesOverlap, isoToday, quoteStay, daysBetween } from "@/lib/utils";
+import { waLink, replyMessage } from "@/lib/whatsapp";
+import { getBusyRanges, getRates, TAG_CONTENIDO, TAG_RESERVAS } from "@/lib/data";
 
 export type State = { ok?: boolean; error?: string; message?: string; waUrl?: string; code?: string };
 
@@ -19,154 +19,26 @@ const one = async <T>(q: Promise<T[]>): Promise<T | null> => (await q)[0] ?? nul
 
 /* ============================ AUTENTICACION ============================ */
 
-const registerSchema = z.object({
-  name: z.string().trim().min(2, "Ingresa tu nombre completo"),
-  email: z.string().trim().toLowerCase().email("Email invalido"),
-  phone: z.string().trim().max(30).optional().default(""),
-  password: z.string().min(8, "La contrasena debe tener al menos 8 caracteres"),
-});
-
-export async function registerAction(_prev: State, form: FormData): Promise<State> {
-  const parsed = registerSchema.safeParse(Object.fromEntries(form));
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const { name, email, phone, password } = parsed.data;
-
-  const exists = await one(db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1));
-  if (exists) return { error: "Ya existe una cuenta con ese email. Proba ingresar." };
-
-  const id = uid();
-  await db.insert(schema.users).values({
-    id, name, email, phone: phone ?? "",
-    passwordHash: bcrypt.hashSync(password, 10),
-    role: "guest", createdAt: Date.now(),
-  });
-
-  await createSession({ id, name, email, role: "guest" }, "guest");
-  redirect("/mi-cuenta");
-}
-
-export async function loginAction(_prev: State, form: FormData): Promise<State> {
-  const email = String(form.get("email") ?? "").trim().toLowerCase();
-  const password = String(form.get("password") ?? "");
-  if (!email || !password) return { error: "Completa email y contrasena" };
-
-  const user = await one(db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1));
-  if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
-    return { error: "Email o contrasena incorrectos" };
-  }
-  if (user.role === "owner") {
-    return { error: "Esa es la cuenta del propietario. Entra por el acceso del panel." };
-  }
-  await createSession({ id: user.id, name: user.name, email: user.email, role: "guest" }, "guest");
-  redirect("/mi-cuenta");
-}
-
-/** Acceso exclusivo del propietario. Rechaza cuentas de huesped. */
+/** Unico acceso del sistema: el propietario. */
 export async function loginOwnerAction(_prev: State, form: FormData): Promise<State> {
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   const password = String(form.get("password") ?? "");
-  if (!email || !password) return { error: "Completa email y contrasena" };
+  const recordar = !!form.get("recordar");
+  if (!email || !password) return { error: "Completá email y contraseña" };
 
   const user = await one(db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1));
   if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
-    return { error: "Email o contrasena incorrectos" };
+    return { error: "Email o contraseña incorrectos" };
   }
-  if (user.role !== "owner") {
-    return { error: "Esa cuenta es de huesped. Ingresa desde el acceso de huespedes." };
-  }
-  await createSession({ id: user.id, name: user.name, email: user.email, role: "owner" }, "owner");
+  if (user.role !== "owner") return { error: "Esa cuenta no tiene acceso al panel" };
+
+  await createSession({ id: user.id, name: user.name, email: user.email, role: "owner" }, recordar);
   redirect("/panel");
 }
 
-/** Cierra la sesion de huesped. No toca la del propietario. */
-export async function logoutAction() {
-  await destroySession("guest");
-  redirect("/");
-}
-
-/** Cierra la sesion del propietario. No toca la del huesped. */
 export async function logoutOwnerAction() {
-  await destroySession("owner");
+  await destroySession();
   redirect("/propietario");
-}
-
-/* ============================== RESERVAS ============================== */
-
-const bookingSchema = z.object({
-  propertyId: z.string().min(1),
-  checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha de entrada invalida"),
-  checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha de salida invalida"),
-  adults: z.coerce.number().int().min(1).max(30),
-  children: z.coerce.number().int().min(0).max(30),
-  phone: z.string().trim().max(30).optional().default(""),
-  message: z.string().trim().max(1200).optional().default(""),
-});
-
-export async function createBookingAction(_prev: State, form: FormData): Promise<State> {
-  const session = await getGuestSession();
-  if (!session) return { error: "Necesitas una cuenta de huesped para solicitar la reserva.", code: "AUTH" };
-
-  const parsed = bookingSchema.safeParse(Object.fromEntries(form));
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const { propertyId, checkIn, checkOut, adults, children, phone, message } = parsed.data;
-
-  const property = await one(db.select().from(schema.properties).where(eq(schema.properties.id, propertyId)).limit(1));
-  if (!property) return { error: "Alojamiento no encontrado" };
-
-  if (checkIn < isoToday()) return { error: "La fecha de entrada no puede ser anterior a hoy" };
-  const nights = nightsBetween(checkIn, checkOut);
-  if (nights < 1) return { error: "La salida tiene que ser posterior a la entrada" };
-  if (nights < property.minNights) return { error: `La estadia minima es de ${property.minNights} noches` };
-  if (adults + children > property.maxGuests) {
-    return { error: `${property.name} admite hasta ${property.maxGuests} huespedes` };
-  }
-
-  const busy = await getBusyRanges(propertyId);
-  if (busy.some((b) => rangesOverlap(checkIn, checkOut, b.from, b.to))) {
-    return { error: "Esas fechas ya estan ocupadas. Proba con otras." };
-  }
-
-  const estimate = nights * property.basePrice + property.cleaningFee;
-  const code = bookingCode();
-  const now = Date.now();
-
-  if (phone) {
-    await db.update(schema.users).set({ phone }).where(eq(schema.users.id, session.id));
-  }
-
-  await db.insert(schema.bookings).values({
-    id: uid(), code, propertyId, userId: session.id,
-    guestName: session.name, guestEmail: session.email, guestPhone: phone ?? "",
-    checkIn, checkOut, nights, adults, children, message: message ?? "",
-    estimate, status: "pendiente", ownerReply: "", createdAt: now, updatedAt: now,
-  });
-
-  const setting = await one(db.select().from(schema.settings).where(eq(schema.settings.key, "whatsapp")).limit(1));
-  const ownerPhone = setting?.value || process.env.NEXT_PUBLIC_WHATSAPP || "5491100000000";
-
-  const text = requestMessage({
-    code, property: property.name, name: session.name, phone: phone ?? "",
-    checkIn: prettyDate(checkIn), checkOut: prettyDate(checkOut), nights, adults, children,
-    estimate: money(estimate, property.currency), message: message ?? "",
-  });
-
-  revalidateTag(TAG_RESERVAS);
-  revalidatePath("/mi-cuenta");
-  revalidatePath("/panel");
-  return { ok: true, code, waUrl: waLink(ownerPhone, text), message: "Solicitud registrada" };
-}
-
-export async function cancelBookingAction(formData: FormData) {
-  const session = await getGuestSession();
-  if (!session) throw new Error("No autorizado");
-  const id = String(formData.get("id"));
-  const b = await one(db.select().from(schema.bookings).where(eq(schema.bookings.id, id)).limit(1));
-  if (!b || b.userId !== session.id) throw new Error("No autorizado");
-  await db.update(schema.bookings).set({ status: "cancelada", updatedAt: Date.now() })
-    .where(eq(schema.bookings.id, id));
-  revalidateTag(TAG_RESERVAS);
-  revalidatePath("/mi-cuenta");
-  revalidatePath("/panel");
 }
 
 /* ====================== PANEL DEL PROPIETARIO ====================== */
@@ -205,7 +77,6 @@ export async function replyBookingAction(_prev: State, form: FormData): Promise<
 
   revalidateTag(TAG_RESERVAS);
   revalidatePath("/panel");
-  revalidatePath("/mi-cuenta");
   return {
     ok: true,
     message: `Reserva ${b.code} marcada como ${status}`,
@@ -407,6 +278,121 @@ export async function addBlockAction(form: FormData) {
 export async function deleteBlockAction(form: FormData) {
   await assertOwner();
   await db.delete(schema.blocks).where(eq(schema.blocks.id, String(form.get("id"))));
+  revalidateTag(TAG_CONTENIDO);
+  revalidatePath("/", "layout");
+}
+
+/* ============ RESERVAS MANUALES (las carga el propietario) ============ */
+
+const manualSchema = z.object({
+  propertyId: z.string().min(1),
+  guestName: z.string().trim().min(2, "Ingresá el nombre del huésped"),
+  guestPhone: z.string().trim().max(30).optional().default(""),
+  checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha de entrada inválida"),
+  checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha de salida inválida"),
+  adults: z.coerce.number().int().min(1).max(40),
+  children: z.coerce.number().int().min(0).max(40),
+  estimate: z.coerce.number().int().min(0).optional().default(0),
+  message: z.string().trim().max(1200).optional().default(""),
+  status: z.string().optional().default("confirmada"),
+});
+
+/**
+ * Carga una reserva a mano. Si queda confirmada, esas fechas se cierran
+ * automaticamente en el calendario publico.
+ */
+export async function createManualBookingAction(_prev: State, form: FormData): Promise<State> {
+  const owner = await assertOwner();
+
+  const parsed = manualSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const d = parsed.data;
+
+  const property = await one(db.select().from(schema.properties).where(eq(schema.properties.id, d.propertyId)).limit(1));
+  if (!property) return { error: "Alojamiento no encontrado" };
+
+  const nights = nightsBetween(d.checkIn, d.checkOut);
+  if (nights < 1) return { error: "La salida tiene que ser posterior a la entrada" };
+
+  const status = ["pendiente", "confirmada", "rechazada", "cancelada"].includes(d.status) ? d.status : "confirmada";
+
+  if (status === "confirmada") {
+    const busy = await getBusyRanges(d.propertyId);
+    if (busy.some((b) => rangesOverlap(d.checkIn, d.checkOut, b.from, b.to))) {
+      return { error: "Esas fechas se superponen con otra reserva confirmada o un bloqueo" };
+    }
+  }
+
+  // Si no se indica monto, se calcula con las tarifas por dia
+  let estimate = d.estimate;
+  if (!estimate) {
+    const rates = await getRates(d.propertyId);
+    estimate = quoteStay(d.checkIn, d.checkOut, property.basePrice, rates, property.cleaningFee).total;
+  }
+
+  const now = Date.now();
+  await db.insert(schema.bookings).values({
+    id: uid(), code: bookingCode(), propertyId: d.propertyId, userId: owner.id,
+    guestName: d.guestName, guestEmail: "", guestPhone: d.guestPhone ?? "",
+    checkIn: d.checkIn, checkOut: d.checkOut, nights,
+    adults: d.adults, children: d.children, message: d.message ?? "",
+    estimate, status, ownerReply: "", createdAt: now, updatedAt: now,
+  });
+
+  revalidateTag(TAG_RESERVAS);
+  revalidatePath("/", "layout");
+  return { ok: true, message: `Reserva de ${d.guestName} cargada (${nights} noches)` };
+}
+
+export async function deleteBookingAction(form: FormData) {
+  await assertOwner();
+  await db.delete(schema.bookings).where(eq(schema.bookings.id, String(form.get("id"))));
+  revalidateTag(TAG_RESERVAS);
+  revalidatePath("/", "layout");
+}
+
+/* ==================== TARIFAS POR DIA ==================== */
+
+/** Fija un precio para cada dia del rango indicado. */
+export async function setRateRangeAction(_prev: State, form: FormData): Promise<State> {
+  await assertOwner();
+  const propertyId = String(form.get("propertyId"));
+  const from = String(form.get("fromDate") ?? "");
+  const to = String(form.get("toDate") ?? "");
+  const price = Number(form.get("price"));
+
+  if (!from || !to) return { error: "Elegí las dos fechas" };
+  if (to < from) return { error: "La fecha final tiene que ser posterior" };
+  if (!Number.isFinite(price) || price <= 0) return { error: "Ingresá un precio válido" };
+
+  // el rango incluye el ultimo dia
+  const fin = new Date(to + "T00:00:00");
+  fin.setDate(fin.getDate() + 1);
+  const dias = daysBetween(from, fin.toISOString().slice(0, 10));
+  if (dias.length > 400) return { error: "El rango no puede superar los 400 días" };
+
+  for (const day of dias) {
+    await db.insert(schema.rates)
+      .values({ id: uid(), propertyId, day, price })
+      .onConflictDoUpdate({ target: [schema.rates.propertyId, schema.rates.day], set: { price } });
+  }
+
+  revalidateTag(TAG_CONTENIDO);
+  revalidatePath("/", "layout");
+  return { ok: true, message: `${dias.length} día(s) a ${money(price)}` };
+}
+
+export async function deleteRateAction(form: FormData) {
+  await assertOwner();
+  await db.delete(schema.rates).where(eq(schema.rates.id, String(form.get("id"))));
+  revalidateTag(TAG_CONTENIDO);
+  revalidatePath("/", "layout");
+}
+
+/** Borra todas las tarifas especiales de un alojamiento: vuelve al precio base. */
+export async function clearRatesAction(form: FormData) {
+  await assertOwner();
+  await db.delete(schema.rates).where(eq(schema.rates.propertyId, String(form.get("propertyId"))));
   revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }

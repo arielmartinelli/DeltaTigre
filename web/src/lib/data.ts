@@ -146,6 +146,25 @@ async function _getBusyRanges(propertyId: string) {
   ];
 }
 
+/** Tarifas por dia de un alojamiento, como mapa fecha -> precio. */
+async function _getRates(propertyId: string) {
+  const filas = await run(
+    () => db.select().from(schema.rates).where(eq(schema.rates.propertyId, propertyId)),
+    "tarifas"
+  );
+  return Object.fromEntries(filas.map((r) => [r.day, r.price])) as Record<string, number>;
+}
+
+/** Tarifas con su id, para editarlas en el panel. Sin cache. */
+export async function getRateRows(propertyId: string) {
+  return run(
+    () => db.select().from(schema.rates)
+      .where(eq(schema.rates.propertyId, propertyId))
+      .orderBy(asc(schema.rates.day)),
+    "tarifas panel"
+  );
+}
+
 /** Ocupacion detallada para el panel: quien, cuando y por que. Sin cache. */
 export async function getOccupancy(propertyId: string) {
   const [reservas, bloqueos] = await Promise.all([
@@ -196,3 +215,4 @@ export const getNearby = cache(_getNearby, "getNearby", [TAG_CONTENIDO]);
 export const getActivities = cache(_getActivities, "getActivities", [TAG_CONTENIDO]);
 export const getBlocks = cache(_getBlocks, "getBlocks", [TAG_RESERVAS]);
 export const getBusyRanges = cache(_getBusyRanges, "getBusyRanges", [TAG_RESERVAS]);
+export const getRates = cache(_getRates, "getRates", [TAG_CONTENIDO]);

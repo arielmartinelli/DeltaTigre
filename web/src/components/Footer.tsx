@@ -31,7 +31,7 @@ export default function Footer({ wa, email, instagram }: { wa: string; email: st
           <nav className="md:col-span-3">
             <p className="tag bg-cream/8 text-cream/60">Navegacion</p>
             <ul className="mt-5 space-y-3 text-[15px]">
-              {[["/", "Inicio"], ["/cabanas", "Las cabanas"], ["/ubicacion", "Ubicacion"], ["/experiencias", "Que hacer"], ["/mi-cuenta", "Mi cuenta"], ["/propietario", "Soy el propietario"]].map(([h, l]) => (
+              {[["/", "Inicio"], ["/cabanas", "Las cabanas"], ["/ubicacion", "Ubicacion"], ["/experiencias", "Que hacer"], ["/propietario", "Soy el propietario"]].map(([h, l]) => (
                 <li key={h}>
                   <Link href={h} className="ul-slide text-cream/60 transition-colors duration-400 hover:text-cream">{l}</Link>
                 </li>

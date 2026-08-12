@@ -1,9 +1,10 @@
 import PageHead from "@/components/panel/PageHead";
 import Calendar from "@/components/Calendar";
+import Tarifas from "@/components/panel/Tarifas";
 import Icon from "@/components/Icon";
 import { StatusPill, inputCx } from "@/components/Bits";
 import { addBlockAction, deleteBlockAction } from "@/app/actions";
-import { getProperties, getOccupancy } from "@/lib/data";
+import { getProperties, getOccupancy, getRateRows } from "@/lib/data";
 import { prettyDate, isoToday, nightsBetween } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +12,9 @@ export const maxDuration = 20;
 
 export default async function FechasPage() {
   const props = await getProperties();
-  const datos = await Promise.all(props.map(async (p) => ({ p, ...(await getOccupancy(p.id)) })));
+  const datos = await Promise.all(props.map(async (p) => ({
+    p, ...(await getOccupancy(p.id)), tarifas: await getRateRows(p.id),
+  })));
   const hoy = isoToday();
 
   return (
@@ -19,11 +22,11 @@ export default async function FechasPage() {
       <PageHead
         eyebrow="Disponibilidad"
         title="Fechas disponibles"
-        description="Mirá de un vistazo qué días están tomados y bloqueá los que no querés alquilar."
+        description="Qué días están tomados, cuáles querés bloquear y cuánto cobrás cada fecha."
       />
 
       <div className="space-y-10">
-        {datos.map(({ p, reservas, bloqueos, ocupados }) => {
+        {datos.map(({ p, reservas, bloqueos, ocupados, tarifas }) => {
           const proximas = reservas
             .filter((b) => b.checkOut >= hoy && b.status !== "cancelada" && b.status !== "rechazada")
             .slice(0, 8);
@@ -83,7 +86,11 @@ export default async function FechasPage() {
                       )}
                     </div>
 
-                    <div>
+                    <div className="border-t border-ink/8 pt-6">
+                      <Tarifas propertyId={p.id} basePrice={p.basePrice} filas={tarifas} />
+                    </div>
+
+                    <div className="border-t border-ink/8 pt-6">
                       <p className="text-[11px] uppercase tracking-[0.16em] text-ink-45">Próximas estadías</p>
                       {proximas.length === 0 ? (
                         <p className="mt-3 rounded-xl bg-shell/70 px-4 py-5 text-center text-[13px] text-ink-45">

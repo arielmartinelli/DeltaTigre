@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Gallery from "@/components/Gallery";
 import MapEmbed from "@/components/MapEmbed";
 import Calendar from "@/components/Calendar";
-import BookingForm from "@/components/BookingForm";
+import ConsultaForm from "@/components/ConsultaForm";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import { Eyebrow, Stars, Divider } from "@/components/Bits";
@@ -12,8 +12,8 @@ import { CTA } from "@/components/Button";
 import {
   getPropertyBySlug, getImages, getAmenities, getRules, getNearby,
   getBusyRanges, groupAmenities, getActiveProperties, getActivities,
+  getRates, getSettings,
 } from "@/lib/data";
-import { getGuestSession } from "@/lib/session";
 
 export async function generateStaticParams() {
   try {
@@ -40,9 +40,10 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
   const p = await getPropertyBySlug(slug);
   if (!p) notFound();
 
-  const [images, amenities, rules, nearby, busy, session, activities, all] = await Promise.all([
+  const [images, amenities, rules, nearby, busy, activities, all, rates, settings] = await Promise.all([
     getImages(p.id), getAmenities(p.id), getRules(p.id), getNearby(),
-    getBusyRanges(p.id), getGuestSession(), getActivities(), getActiveProperties(),
+    getBusyRanges(p.id), getActivities(), getActiveProperties(),
+    getRates(p.id), getSettings(),
   ]);
   const { featured, groups } = groupAmenities(amenities);
   const other = all.find((x) => x.id !== p.id);
@@ -213,7 +214,12 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-28">
               <Reveal delay={60}>
-                <BookingForm property={p} busy={busy} isLogged={!!session} />
+                <ConsultaForm
+                  property={p}
+                  busy={busy}
+                  rates={rates}
+                  whatsapp={settings.whatsapp ?? "5491100000000"}
+                />
               </Reveal>
             </div>
           </div>

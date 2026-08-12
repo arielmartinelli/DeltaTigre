@@ -121,3 +121,10 @@ export const settings = pgTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull().default(""),
 });
+
+export const rates = pgTable("rates", {
+  id: text("id").primaryKey(),
+  propertyId: text("property_id").notNull(),
+  day: text("day").notNull(),
+  price: integer("price").notNull(),
+});

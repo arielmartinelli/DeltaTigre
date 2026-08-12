@@ -58,6 +58,7 @@ export default function PropertyCard({
 
             <div className="flex items-end justify-between gap-4 border-t border-ink/8 pt-5">
               <p className="text-[13px] text-ink-45">
+                <span>desde </span>
                 <span className="display text-[22px] text-ink">{money(p.basePrice, p.currency)}</span>
                 <span className="ml-1.5">/ noche</span>
               </p>

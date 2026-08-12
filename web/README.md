@@ -1,7 +1,10 @@
 # Delta Tigre — sitio web y sistema de reservas
 
-Sitio estilo Airbnb/Booking para las dos casas de Delta Tigre, con cuentas de huésped,
-solicitudes de reserva que salen por WhatsApp y un panel del propietario para editar todo.
+Sitio estilo Airbnb/Booking para las dos casas de Delta Tigre. El huésped consulta
+disponibilidad por WhatsApp con un mensaje armado por el sitio; el propietario administra
+reservas, fechas, precios por día y contenido desde su panel.
+
+**No hay cuentas de usuario.** La única sesión del sistema es la del propietario.
 
 Stack: **Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Drizzle ORM**
 Base de datos: **Postgres (Supabase)**, con el driver `postgres` en JS puro — no requiere
@@ -30,6 +33,9 @@ en el **SQL Editor** de Supabase. Ver [SUPABASE.md](./SUPABASE.md).
 | Email | Contraseña |
 |---|---|
 | `propietario@deltatigre.com.ar` | `DeltaTigre2026!` |
+
+Al ingresar, la casilla **«Mantener la sesión abierta»** deja la sesión viva 6 meses:
+no vuelve a pedir la contraseña hasta que se cierre desde el panel.
 
 > **Cambiá esa contraseña antes de publicar el sitio**, porque figura en este archivo:
 >
@@ -72,37 +78,42 @@ El WhatsApp también se puede cambiar sin tocar el código, desde **Panel → Co
 | `/cabanas/delta-uno` · `/cabanas/delta-dos` | Ficha completa: galería con lightbox, servicios agrupados, normas, mapa, formulario de reserva |
 | `/ubicacion` | Cómo llegar paso a paso + mapa + qué hay cerca |
 | `/experiencias` | Qué hacer en el Delta |
-| `/ingresar` · `/crear-cuenta` | Cuentas de huésped |
-| `/mi-cuenta` | Reservas del huésped y respuestas del propietario |
-| `/panel` | **Panel del propietario** (solo rol `owner`) |
+| `/propietario` | Acceso del propietario |
+| `/panel` | **Panel administrativo** |
 
 ---
 
-## Cómo funciona una reserva
+## Cómo funciona una consulta
 
-1. El huésped se crea una cuenta y elige fechas en la ficha de la casa.
-2. Al enviar, la solicitud queda guardada con estado **pendiente** y se abre WhatsApp
-   con el mensaje ya escrito hacia el número del propietario (código, casa, fechas, huéspedes, estimado).
-3. La solicitud aparece en **Panel → Reservas**.
-4. El propietario la marca **confirmada / rechazada** y escribe un mensaje.
-   Al guardar se abre WhatsApp hacia el huésped con la respuesta, y esa misma respuesta
-   queda visible en `/mi-cuenta`.
-5. Sólo las reservas **confirmadas** (y los bloqueos manuales) ocupan el calendario.
+1. El huésped entra a la ficha de una casa y ve el **calendario con los días ocupados**.
+2. Escribe su nombre, elige fechas y cantidad de huéspedes. El sitio calcula el estimado
+   sumando el precio de cada noche.
+3. Toca **Consultar disponibilidad** y se abre WhatsApp con el mensaje ya escrito:
 
-Validaciones: fechas pasadas, salida anterior a la entrada, estadía mínima, capacidad máxima
-y solapamiento con fechas ya ocupadas — todo se chequea en el cliente y otra vez en el servidor.
+   > Hola! Soy Ariel.
+   > Quiero consultar por **Delta Uno**:
+   > Del 12 de sep al 15 de sep (3 noches)
+   > Somos 2 adultos y 1 menor
+   > Estimado en la web: $ 270.000
+   > Me confirmás si están disponibles esas fechas?
 
----
+4. El propietario responde por WhatsApp. Si cierran el trato, **carga la reserva en el panel**
+   y esas fechas se bloquean solas en el calendario del sitio.
+
+No se guarda nada en la base al consultar: el sitio público es solo lectura.
 
 ## Panel del propietario
 
-- **Reservas** — métricas, bandeja de solicitudes, cambio de estado y respuesta por WhatsApp.
+- **Reservas** — métricas, carga manual de reservas y cambio de estado. Una reserva
+  *confirmada* cierra sus fechas en el sitio; una *pendiente* no.
+- **Fechas disponibles** — calendario por casa, bloqueo de períodos, **precio por día**
+  (fines de semana, feriados, temporada) y listado de próximas estadías con nombre del huésped.
 - **Alojamientos** — por cada casa:
   - textos, dirección, coordenadas del mapa, metros, dormitorios, baños, capacidad
-  - **precios**: por noche, temporada alta, limpieza final, noches mínimas
+  - **precios**: base por noche, limpieza final, noches mínimas
+    (el precio de cada fecha se ajusta en *Fechas disponibles*)
   - **fotos**: subir, reordenar, editar descripción, borrar (la primera es la portada)
   - **servicios**: agregar/quitar, elegir ícono, marcar como destacado
-  - **bloquear fechas** manualmente
   - publicar u ocultar la casa
 - **Contenido** — textos de la portada, WhatsApp, email, Instagram y las experiencias.
 

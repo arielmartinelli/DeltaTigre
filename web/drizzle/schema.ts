@@ -116,3 +116,10 @@ export const settings = sqliteTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull().default(""),
 });
+
+export const rates = sqliteTable("rates", {
+  id: text("id").primaryKey(),
+  propertyId: text("property_id").notNull(),
+  day: text("day").notNull(),
+  price: integer("price").notNull(),
+});

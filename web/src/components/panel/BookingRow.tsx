@@ -1,6 +1,6 @@
 "use client";
 import { useActionState, useEffect, useState } from "react";
-import { replyBookingAction, type State } from "@/app/actions";
+import { replyBookingAction, deleteBookingAction, type State } from "@/app/actions";
 import { StatusPill, inputCx } from "@/components/Bits";
 import Icon from "@/components/Icon";
 import { money, prettyDate } from "@/lib/utils";
@@ -46,7 +46,6 @@ export default function BookingRow({ b, propertyName }: { b: B; propertyName: st
           <div className="overflow-hidden">
             <div className="space-y-5 border-t border-ink/8 px-5 py-5">
               <dl className="grid gap-x-8 gap-y-3 text-[13.5px] sm:grid-cols-2">
-                <div><dt className="text-[11px] uppercase tracking-[0.14em] text-ink-45">Email</dt><dd className="mt-1">{b.guestEmail}</dd></div>
                 <div>
                   <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-45">WhatsApp</dt>
                   <dd className="mt-1">{b.guestPhone || <span className="text-ink-45">sin teléfono</span>}</dd>
@@ -88,8 +87,15 @@ export default function BookingRow({ b, propertyName }: { b: B; propertyName: st
                       <Icon name="wa" className="h-4 w-4" />
                     </span>
                   </button>
-                  {!b.guestPhone && <span className="text-[12px] text-ink-45">Sin teléfono: se guarda solo en su cuenta.</span>}
+                  {!b.guestPhone && <span className="text-[12px] text-ink-45">Sin teléfono cargado: solo se guarda el estado.</span>}
                 </div>
+              </form>
+
+              <form action={deleteBookingAction} className="border-t border-ink/8 pt-4">
+                <input type="hidden" name="id" value={b.id} />
+                <button className="inline-flex items-center gap-1.5 text-[12.5px] text-[#8a3a24] transition-opacity hover:opacity-70">
+                  <Icon name="trash" className="h-3.5 w-3.5" />Eliminar esta reserva
+                </button>
               </form>
             </div>
           </div>

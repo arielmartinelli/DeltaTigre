@@ -5,26 +5,21 @@ export function waLink(phone: string, text: string) {
   return `https://wa.me/${clean}?text=${encodeURIComponent(text)}`;
 }
 
-export function requestMessage(o: {
-  code: string; property: string; name: string; phone: string;
-  checkIn: string; checkOut: string; nights: number; adults: number; children: number;
-  estimate: string; message: string;
+export function consultaMessage(o: {
+  nombre: string; alojamiento: string; checkIn: string; checkOut: string;
+  nights: number; adults: number; children: number; estimado: string;
 }) {
+  const huespedes = `${o.adults} adulto${o.adults > 1 ? "s" : ""}${o.children ? ` y ${o.children} menor${o.children > 1 ? "es" : ""}` : ""}`;
   return [
-    `*Nueva solicitud de reserva — Delta Tigre*`,
+    `Hola! Soy ${o.nombre}.`,
     ``,
-    `Codigo: ${o.code}`,
-    `Alojamiento: ${o.property}`,
-    `Huesped: ${o.name}`,
-    o.phone ? `Telefono: ${o.phone}` : "",
-    `Check-in: ${o.checkIn}`,
-    `Check-out: ${o.checkOut}`,
-    `Noches: ${o.nights}`,
-    `Huespedes: ${o.adults} adulto(s)${o.children ? ` + ${o.children} menor(es)` : ""}`,
-    `Estimado: ${o.estimate}`,
-    o.message ? `` : "",
-    o.message ? `Mensaje: ${o.message}` : "",
-  ].filter(Boolean).join("\n");
+    `Quiero consultar por *${o.alojamiento}*:`,
+    `Del ${o.checkIn} al ${o.checkOut} (${o.nights} noche${o.nights > 1 ? "s" : ""})`,
+    `Somos ${huespedes}`,
+    `Estimado en la web: ${o.estimado}`,
+    ``,
+    `Me confirmas si estan disponibles esas fechas?`,
+  ].join("\n");
 }
 
 export function replyMessage(o: {

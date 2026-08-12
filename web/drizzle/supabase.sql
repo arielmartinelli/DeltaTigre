@@ -65,12 +65,18 @@ create table if not exists blocks (
   from_date text not null, to_date text not null, reason text not null default 'Bloqueo manual'
 );
 
+create table if not exists rates (
+  id text primary key, property_id text not null references properties(id) on delete cascade,
+  day text not null, price int not null, unique (property_id, day)
+);
+
 create table if not exists settings (key text primary key, value text not null default '');
 
 create index if not exists idx_img_prop on images(property_id);
 create index if not exists idx_am_prop on amenities(property_id);
 create index if not exists idx_bk_prop on bookings(property_id);
 create index if not exists idx_bk_user on bookings(user_id);
+create index if not exists idx_rates_prop_day on rates(property_id, day);
 
 -- La app usa su propia sesion (cookie JWT httpOnly) y se conecta con la service key
 -- desde el servidor, por eso RLS queda deshabilitado en estas tablas.

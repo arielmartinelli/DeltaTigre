@@ -4,7 +4,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
-import AuthForm from "@/components/AuthForm";
+import OwnerLoginForm from "@/components/OwnerLoginForm";
 import { getOwnerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
@@ -45,8 +45,8 @@ export default async function OwnerLoginPage() {
 
         <Reveal delay={120}>
           <div className="shell shell-dark">
-            <div className="core core-dark p-7 sm:p-9 [&_input]:!bg-white/5 [&_input]:!text-cream [&_input]:!shadow-[inset_0_0_0_1px_rgba(251,250,243,0.14)] [&_span]:!text-cream/50">
-              <AuthForm mode="owner" />
+            <div className="core core-dark p-7 sm:p-9">
+              <OwnerLoginForm />
             </div>
           </div>
         </Reveal>

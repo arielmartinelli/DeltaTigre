@@ -2,18 +2,12 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 /**
- * Dos sesiones totalmente independientes, cada una con su propia cookie:
- *
- *   huesped     -> delta_huesped   (sitio publico y /mi-cuenta)
- *   propietario -> delta_admin     (/propietario y /panel)
- *
- * No se pisan ni se heredan: estar logueado como huesped no da ningun acceso
- * al panel, y viceversa. Se puede tener las dos abiertas a la vez.
+ * Unica sesion del sistema: la del propietario.
+ * El sitio publico no tiene cuentas — las consultas salen por WhatsApp.
  */
-export type Scope = "guest" | "owner";
+export type Scope = "owner";
 
 const COOKIES: Record<Scope, string> = {
-  guest: "delta_huesped",
   owner: "delta_admin",
 };
 
@@ -23,54 +17,56 @@ const secret = new TextEncoder().encode(
 
 export type SessionUser = { id: string; name: string; email: string; role: Scope };
 
-async function sign(user: SessionUser, scope: Scope) {
-  return new SignJWT({ ...user, scope })
+const DIAS_CORTA = 1;
+const DIAS_RECORDAR = 180;
+
+async function sign(user: SessionUser, dias: number) {
+  return new SignJWT({ ...user, scope: "owner" })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(scope === "owner" ? "7d" : "30d")
+    .setExpirationTime(`${dias}d`)
     .sign(secret);
 }
 
-export async function createSession(user: SessionUser, scope: Scope) {
+/**
+ * `recordar` mantiene la sesion 6 meses: no se cierra hasta que el propietario
+ * apriete "Cerrar sesion". Sin eso, dura un dia.
+ */
+export async function createSession(user: SessionUser, recordar = true) {
+  const dias = recordar ? DIAS_RECORDAR : DIAS_CORTA;
   const jar = await cookies();
-  jar.set(COOKIES[scope], await sign(user, scope), {
+  jar.set(COOKIES.owner, await sign(user, dias), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 24 * (scope === "owner" ? 7 : 30),
+    maxAge: 60 * 60 * 24 * dias,
   });
 }
 
-export async function destroySession(scope: Scope) {
+export async function destroySession() {
   const jar = await cookies();
-  jar.delete(COOKIES[scope]);
+  jar.delete(COOKIES.owner);
 }
 
-async function read(scope: Scope): Promise<SessionUser | null> {
+export async function getOwnerSession(): Promise<SessionUser | null> {
   const jar = await cookies();
-  const token = jar.get(COOKIES[scope])?.value;
+  const token = jar.get(COOKIES.owner)?.value;
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secret);
     // El token tiene que haber sido emitido para este ambito.
-    if (payload.scope !== scope) return null;
+    if (payload.scope !== "owner") return null;
     return {
       id: String(payload.id),
       name: String(payload.name),
       email: String(payload.email),
-      role: scope,
+      role: "owner",
     };
   } catch {
     return null;
   }
 }
-
-/** Sesion de huesped: sitio publico, reservas y /mi-cuenta. */
-export const getGuestSession = () => read("guest");
-
-/** Sesion de propietario: /propietario y /panel. */
-export const getOwnerSession = () => read("owner");
 
 export async function requireOwner() {
   const s = await getOwnerSession();

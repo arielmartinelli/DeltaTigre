@@ -202,13 +202,13 @@ export default async function Home() {
                 Contanos que fin de semana tenes en mente
               </h2>
               <p className="max-w-md text-[15.5px] leading-relaxed text-cream/70">
-                Creas tu cuenta, elegis las fechas y enviamos la solicitud al propietario por WhatsApp. Te respondemos ahi mismo y en tu perfil.
+                Elegí las fechas en el calendario de cada casa y el sitio te arma el mensaje. Te respondemos por WhatsApp con la confirmación.
               </p>
               <div className="mt-2 flex flex-wrap justify-center gap-3">
                 <CTA href="/cabanas" variant="wa" icon="cal">Consultar disponibilidad</CTA>
-                <CTA href="/crear-cuenta" variant="outline" icon="users"
+                <CTA href="/ubicacion" variant="outline" icon="pin"
                   className="!text-cream !shadow-[inset_0_0_0_1px_rgba(251,250,243,0.3)] hover:!bg-cream hover:!text-ink">
-                  Crear cuenta
+                  Cómo llegar
                 </CTA>
               </div>
             </div>

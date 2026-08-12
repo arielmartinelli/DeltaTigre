@@ -26,3 +26,26 @@ export function rangesOverlap(aIn: string, aOut: string, bIn: string, bOut: stri
 
 export const bookingCode = () =>
   "DT-" + Math.random().toString(36).slice(2, 6).toUpperCase() + Date.now().toString(36).slice(-3).toUpperCase();
+
+/** Lista de días de una estadía (la salida no se cobra). */
+export function daysBetween(checkIn: string, checkOut: string): string[] {
+  const out: string[] = [];
+  const d = new Date(checkIn + "T00:00:00");
+  const fin = new Date(checkOut + "T00:00:00");
+  while (d < fin) {
+    out.push(d.toISOString().slice(0, 10));
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+
+/** Suma el precio de cada noche, usando la tarifa del día si existe. */
+export function quoteStay(
+  checkIn: string, checkOut: string, basePrice: number,
+  rates: Record<string, number>, cleaningFee = 0
+) {
+  const dias = daysBetween(checkIn, checkOut);
+  const noches = dias.map((d) => ({ day: d, price: rates[d] ?? basePrice }));
+  const subtotal = noches.reduce((s, n) => s + n.price, 0);
+  return { noches, nights: dias.length, subtotal, total: subtotal + cleaningFee };
+}

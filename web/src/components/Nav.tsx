@@ -4,7 +4,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Icon from "./Icon";
-import type { SessionUser } from "@/lib/session";
+import { waLink } from "@/lib/whatsapp";
 
 const links = [
   { href: "/", label: "Inicio" },
@@ -13,7 +13,7 @@ const links = [
   { href: "/experiencias", label: "Que hacer" },
 ];
 
-export default function Nav({ user }: { user: SessionUser | null }) {
+export default function Nav({ whatsapp }: { whatsapp: string }) {
   const [open, setOpen] = useState(false);
   const [solid, setSolid] = useState(false);
   const path = usePathname();
@@ -64,23 +64,13 @@ export default function Nav({ user }: { user: SessionUser | null }) {
           </div>
 
           <div className="ml-auto flex items-center gap-2 md:ml-2">
-            {user ? (
-              <Link href="/mi-cuenta"
-                className="group hidden items-center gap-2 rounded-full bg-ink py-2 pl-4 pr-2 text-[13px] text-cream transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-palm-deep active:scale-[0.97] sm:flex">
-                <span>{user.name.split(" ")[0]}</span>
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-cream/12 transition-transform duration-500 group-hover:translate-x-0.5">
-                  <Icon name="users" className="h-3.5 w-3.5" />
-                </span>
-              </Link>
-            ) : (
-              <Link href="/ingresar"
-                className="group hidden items-center gap-2 rounded-full bg-ink py-2 pl-4 pr-2 text-[13px] text-cream transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-palm-deep active:scale-[0.97] sm:flex">
-                <span>Ingresar</span>
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-cream/12 transition-transform duration-500 group-hover:translate-x-0.5">
-                  <Icon name="arrow" className="h-3.5 w-3.5" />
-                </span>
-              </Link>
-            )}
+            <a href={waLink(whatsapp, "Hola! Quiero consultar por Delta Tigre.")} target="_blank" rel="noopener noreferrer"
+              className="group hidden items-center gap-2 rounded-full bg-palm py-2 pl-4 pr-2 text-[13px] text-paper transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-palm-deep active:scale-[0.97] sm:flex">
+              <span>Consultar</span>
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-paper/18 transition-transform duration-500 group-hover:translate-x-0.5">
+                <Icon name="wa" className="h-3.5 w-3.5" />
+              </span>
+            </a>
 
             <button onClick={() => setOpen((v) => !v)} aria-label="Menu" aria-expanded={open}
               className="relative grid h-10 w-10 place-items-center rounded-full hairline bg-paper/60 md:hidden">
@@ -97,9 +87,7 @@ export default function Nav({ user }: { user: SessionUser | null }) {
           ${open ? "opacity-100" : "pointer-events-none opacity-0"}`}
       >
         <div className="flex h-full flex-col justify-center px-8">
-          {[...links, user
-            ? { href: "/mi-cuenta", label: "Mi cuenta" }
-            : { href: "/ingresar", label: "Ingresar" }].map((l, i) => (
+          {links.map((l, i) => (
             <div key={l.href} className="overflow-hidden">
               <Link href={l.href}
                 className="block py-3 font-display text-[clamp(2rem,10vw,3.25rem)] leading-[1.05] tracking-tight transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:translate-x-2"
