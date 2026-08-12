@@ -10,7 +10,8 @@
     "lint": "next lint",
     "seed": "tsx src/lib/seed.ts",
     "reset": "npm run seed",
-    "owner": "tsx src/lib/owner.ts"
+    "owner": "tsx src/lib/owner.ts",
+    "ajustes": "tsx src/lib/ajustes.ts"
   },
   "keywords": [],
   "author": "",

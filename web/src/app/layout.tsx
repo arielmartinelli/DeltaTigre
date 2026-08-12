@@ -8,12 +8,12 @@ export const metadata: Metadata = {
     template: "%s · Delta Tigre",
   },
   description:
-    "Dos casas de madera con deck y muelle propio sobre el Arroyo Gambado, primera sección del Delta de Tigre. Reservá online o por WhatsApp.",
+    "Dos casas de madera con deck y bajada al arroyo sobre el Arroyo Gambado, primera sección del Delta de Tigre. Reservá online o por WhatsApp.",
   keywords: ["cabañas Tigre", "Delta de Tigre", "alquiler Delta", "Arroyo Gambado", "cabañas río", "escapada Buenos Aires"],
   openGraph: {
     type: "website", locale: "es_AR", siteName: "Delta Tigre",
     title: "Delta Tigre — Cabañas sobre el Arroyo Gambado",
-    description: "Dos casas de madera con deck y muelle propio en el Delta de Tigre.",
+    description: "Dos casas de madera con deck y galería en el Delta de Tigre.",
     images: ["/img/delta-uno/13.webp"],
   },
   robots: { index: true, follow: true },

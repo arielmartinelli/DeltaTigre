@@ -6,7 +6,7 @@ import { getActiveProperties, getCovers } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Las cabañas",
-  description: "Delta Uno y Delta Dos: dos casas de madera sobre el Arroyo Gambado, con deck, parrilla y muelle propio.",
+  description: "Delta Uno y Delta Dos: dos casas de madera sobre el Arroyo Gambado, con deck, parrilla y bajada al arroyo.",
 };
 
 export default async function CabanasPage() {

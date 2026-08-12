@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 const steps = [
   { icon: "train", t: "Llegá a Tigre", d: "Tren de la línea Mitre (ramal Tigre) desde Retiro, o el Tren de la Costa desde Maipú. En auto, por Panamericana ramal Tigre — hay estacionamientos pagos junto a la estación fluvial." },
-  { icon: "boat", t: "Tomá la lancha colectiva", d: "En la Estación Fluvial de Tigre salen las lanchas de línea. Pedí el ramal del Arroyo Gambado y avisá el número de muelle: 486 para Delta Uno, 147 para Delta Dos. El viaje es de unos 25 minutos." },
+  { icon: "boat", t: "Tomá la lancha colectiva", d: "En la Estación Fluvial de Tigre salen las lanchas de línea. Salen cada 30 minutos los fines de semana y cada 1 hora los días de semana. Pedí el ramal del Arroyo Gambado y avisá el número de muelle: 486 para Delta Uno, 147 para Delta Dos. El viaje es de unos 15 minutos, y te pasamos toda la información al confirmar la reserva." },
   { icon: "pin", t: "Bajá en el muelle", d: "El lanchero para en la puerta. Avisanos tu horario de llegada con antelación así te esperamos en el muelle." },
 ];
 
@@ -30,7 +30,7 @@ export default async function UbicacionPage() {
             Arroyo Gambado,<br /><span className="italic text-palm-deep">primera sección</span>
           </h1>
           <p className="mt-7 max-w-xl text-[16px] leading-relaxed text-ink-70">
-            A 40 minutos de Buenos Aires y a 25 minutos de lancha de la Estación Fluvial de Tigre. Sin autos, sin ruido:
+            A 40 minutos de Buenos Aires y a 15 minutos de lancha de la Estación Fluvial de Tigre. Sin autos, sin ruido:
             se llega por agua y se vive por agua.
           </p>
         </Reveal>

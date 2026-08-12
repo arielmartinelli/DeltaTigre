@@ -55,7 +55,7 @@ export default async function Home() {
               <div className="mt-9 space-y-4">
                 {[
                   ["boat", "Lancha colectiva desde la Estacion Fluvial de Tigre"],
-                  ["river", "Muelle propio y bajada al arroyo"],
+                  ["river", "Muelle compartido y bajada al arroyo"],
                   ["bbq", "Parrilla, jardin con arboles anosos y fogon"],
                 ].map(([i, t]) => (
                   <div key={t} className="flex items-start gap-3.5">

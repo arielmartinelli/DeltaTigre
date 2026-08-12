@@ -28,7 +28,7 @@ const DELTA_UNO_AMENITIES = [
   A("Exteriores", "Balcon", "balcony"),
   A("Exteriores", "Terraza de madera", "terrace"),
   A("Exteriores", "Jardin", "garden"),
-  A("Exteriores", "Muelle propio", "river"),
+  A("Exteriores", "Muelle compartido", "river"),
   A("Comida y bebida", "Almuerzos para llevar", "restaurant"),
   A("Comida y bebida", "Bar", "bar"),
   A("Comida y bebida", "Restaurante", "restaurant"),
@@ -41,7 +41,7 @@ const DELTA_UNO_AMENITIES = [
 
 const DELTA_DOS_AMENITIES = [
   A("Lo mas destacado", "WiFi en todo el predio", "wifi", 1),
-  A("Lo mas destacado", "Chimenea a lena", "fire", 1),
+  A("Lo mas destacado", "Salamandra a lena", "fire", 1),
   A("Lo mas destacado", "Banera", "bath", 1),
   A("Lo mas destacado", "Galeria con hamacas", "terrace", 1),
   A("Lo mas destacado", "Parrilla y quincho", "bbq", 1),
@@ -62,7 +62,7 @@ const DELTA_DOS_AMENITIES = [
   A("Bano", "Bidet", "bidet"),
   A("Bano", "Papel higienico", "toilet"),
   A("Zona de estar", "Sofa", "sofa"),
-  A("Zona de estar", "Chimenea", "fire"),
+  A("Zona de estar", "Salamandra", "fire"),
   A("Zona de estar", "Living comedor", "sofa"),
   A("Cocina", "Cafetera", "coffee"),
   A("Cocina", "Tostadora", "toaster"),
@@ -100,7 +100,7 @@ const RULES = [
   { label: "Check-out", value: "De 08:00 a 18:00.", icon: "logout" },
   { label: "Ninos", value: "Se pueden alojar ninos de cualquier edad. Sin edad minima para el check-in.", icon: "family" },
   { label: "Camas supletorias", value: "No hay camas supletorias disponibles.", icon: "bed" },
-  { label: "Pagos", value: "Solo se aceptan pagos en efectivo.", icon: "cash" },
+  { label: "Pagos", value: "Se abona en efectivo o por transferencia bancaria.", icon: "cash" },
   { label: "Fiestas", value: "No se pueden celebrar fiestas ni eventos.", icon: "nosmoke" },
   { label: "Mascotas", value: "No se admiten mascotas.", icon: "pet" },
   { label: "Estacionamiento", value: "No hay parking. Se llega en lancha colectiva desde la Estacion Fluvial de Tigre.", icon: "boat" },
@@ -141,7 +141,7 @@ const ACTIVITIES = [
     title: "Pesca de costa",
     tag: "Aire libre",
     summary: "Dorado, boga y tararira desde el muelle privado.",
-    body: "El muelle propio es un lugar tranquilo para pescar temprano. Se consiguen carnadas y equipo en los almacenes de la zona, y los baqueanos del lugar saben donde pica.",
+    body: "El muelle es un lugar tranquilo para pescar temprano. Se consiguen carnadas y equipo en los almacenes de la zona, y los baqueanos del lugar saben donde pica.",
     image: "/img/delta-uno/11.webp",
   },
   {
@@ -178,7 +178,7 @@ const IMG_UNO: [string, string][] = [
   ["02", "Bano completo"],
   ["05", "Parrilla bajo los arboles"],
   ["11", "Muelle de madera sobre el arroyo"],
-  ["12", "Deck y amarre privado"],
+  ["12", "Deck sobre el arroyo"],
   ["10", "Restaurante del rio, a 100 metros"],
   ["09", "Bar sobre la costa"],
 ];
@@ -218,9 +218,9 @@ async function main() {
   await db.insert(schema.properties).values([
     {
       id: unoId, slug: "delta-uno", name: "Delta Uno", kind: "Cabana",
-      tagline: "Cabana de madera sobre el Arroyo Gambado, con deck y muelle propio",
+      tagline: "Cabana de madera sobre el Arroyo Gambado, con deck, parrilla y bajada al agua",
       description:
-        "Delta Uno es una cabana de 90 m2 levantada sobre pilotes, a metros del agua. Tiene dos dormitorios, un estar integrado con cocina totalmente equipada, aire acondicionado frio-calor y un deck de madera que rodea la casa y termina en el muelle. Desde la cama se escucha el rio.\n\nEl jardin es compartido con arboles anosos, parrilla y bajada al arroyo. A cien metros hay restaurantes y bar sobre la costa, y la lancha colectiva pasa por el muelle.",
+        "Delta Uno es una cabana de 90 m2 levantada sobre pilotes, a metros del agua. Tiene dos dormitorios, un estar integrado con cocina totalmente equipada, aire acondicionado frio-calor y un deck de madera que rodea la casa y baja hasta el arroyo. Desde la cama se escucha el rio.\n\nEl jardin y el muelle son compartidos, con arboles anosos, parrilla y bajada al arroyo. A cien metros hay restaurantes y bar sobre la costa, y la lancha colectiva pasa por el muelle.",
       address: "Arroyo Gambado 486, 1648 Tigre, Buenos Aires", lat: -34.4128, lng: -58.5793,
       sizeM2: 90, bedrooms: 2, bathrooms: 1, beds: 4, maxGuests: 6,
       basePrice: 85000, highPrice: 110000, cleaningFee: 15000, minNights: 2,
@@ -228,11 +228,11 @@ async function main() {
     },
     {
       id: dosId, slug: "delta-dos", name: "Delta Dos", kind: "Casa",
-      tagline: "Casa de 160 m2 con chimenea, banera y galeria para grupos grandes",
+      tagline: "Casa de 160 m2 con salamandra, parrilla y galeria con hamacas",
       description:
-        "Delta Dos es la casa grande: 160 m2 con living comedor de doble altura, chimenea a lena, cocina completa y una galeria techada que recorre todo el frente, con hamacas paraguayas y mesa larga para comer afuera.\n\nTiene dos dormitorios matrimoniales en planta baja y un altillo con camas para grupos, ademas de dos banos, uno de ellos con banera. Afuera: parrilla, chimenea exterior, patio y bajada propia al arroyo.",
+        "Delta Dos es la casa grande: 160 m2 con living comedor de doble altura, chimenea a lena, cocina completa y una galeria techada que recorre todo el frente, con hamacas paraguayas y mesa larga para comer afuera.\n\nTiene dos dormitorios matrimoniales en planta baja y un altillo con camas para grupos, ademas de un bano completo con banera. Afuera: parrilla, fogon, patio y bajada al arroyo.",
       address: "Arroyo Gambado 147, 1648 Tigre, Buenos Aires", lat: -34.4155, lng: -58.5821,
-      sizeM2: 160, bedrooms: 3, bathrooms: 2, beds: 8, maxGuests: 12,
+      sizeM2: 160, bedrooms: 3, bathrooms: 1, beds: 8, maxGuests: 10,
       basePrice: 145000, highPrice: 190000, cleaningFee: 22000, minNights: 2,
       rating: 9.7, reviews: 46, active: 1, sortOrder: 2,
     },
