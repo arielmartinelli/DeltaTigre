@@ -146,23 +146,36 @@ async function _getBusyRanges(propertyId: string) {
   ];
 }
 
-/** Tarifas por dia de un alojamiento, como mapa fecha -> precio. */
+/**
+ * Tarifas por dia, como mapa fecha -> precio.
+ * Si la tabla `rates` todavia no existe (falta correr migracion-tarifas.sql),
+ * se devuelve vacio y todo se cotiza al precio base en lugar de romper el sitio.
+ */
 async function _getRates(propertyId: string) {
-  const filas = await run(
-    () => db.select().from(schema.rates).where(eq(schema.rates.propertyId, propertyId)),
-    "tarifas"
-  );
-  return Object.fromEntries(filas.map((r) => [r.day, r.price])) as Record<string, number>;
+  try {
+    const filas = await run(
+      () => db.select().from(schema.rates).where(eq(schema.rates.propertyId, propertyId)),
+      "tarifas"
+    );
+    return Object.fromEntries(filas.map((r) => [r.day, r.price])) as Record<string, number>;
+  } catch (e) {
+    console.error("[tarifas] no disponibles, se usa el precio base:", e instanceof Error ? e.message : e);
+    return {} as Record<string, number>;
+  }
 }
 
 /** Tarifas con su id, para editarlas en el panel. Sin cache. */
 export async function getRateRows(propertyId: string) {
-  return run(
-    () => db.select().from(schema.rates)
-      .where(eq(schema.rates.propertyId, propertyId))
-      .orderBy(asc(schema.rates.day)),
-    "tarifas panel"
-  );
+  try {
+    return await run(
+      () => db.select().from(schema.rates)
+        .where(eq(schema.rates.propertyId, propertyId))
+        .orderBy(asc(schema.rates.day)),
+      "tarifas panel"
+    );
+  } catch {
+    return [] as (typeof schema.rates.$inferSelect)[];
+  }
 }
 
 /** Ocupacion detallada para el panel: quien, cuando y por que. Sin cache. */

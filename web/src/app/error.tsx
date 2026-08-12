@@ -14,6 +14,11 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
       <p className="max-w-sm text-[15px] leading-relaxed text-ink-45">
         Puede ser un problema momentáneo de conexión. Probá de nuevo en unos segundos.
       </p>
+      {error.message && (
+        <p className="max-w-md rounded-2xl bg-ink/4 px-4 py-3 text-left text-[12px] leading-relaxed text-ink-45">
+          {error.message}
+        </p>
+      )}
       {error.digest && (
         <p className="text-[11.5px] tabular-nums text-ink-45/70">Referencia: {error.digest}</p>
       )}
