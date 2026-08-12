@@ -12,7 +12,7 @@ import {
   getPropertyBySlug, getImages, getAmenities, getRules, getNearby,
   getBusyRanges, groupAmenities, getActiveProperties, getActivities,
 } from "@/lib/data";
-import { getSession } from "@/lib/session";
+import { getGuestSession } from "@/lib/session";
 
 export async function generateStaticParams() {
   try {
@@ -41,7 +41,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
 
   const [images, amenities, rules, nearby, busy, session, activities, all] = await Promise.all([
     getImages(p.id), getAmenities(p.id), getRules(p.id), getNearby(),
-    getBusyRanges(p.id), getSession(), getActivities(), getActiveProperties(),
+    getBusyRanges(p.id), getGuestSession(), getActivities(), getActiveProperties(),
   ]);
   const { featured, groups } = groupAmenities(amenities);
   const other = all.find((x) => x.id !== p.id);

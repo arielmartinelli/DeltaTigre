@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { getSession } from "@/lib/session";
+import { getGuestSession } from "@/lib/session";
 import { getSettings } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#f5f3e6", width: "device-width", initialScale: 1 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, settings] = await Promise.all([getSession(), getSettings()]);
+  const [user, settings] = await Promise.all([getGuestSession(), getSettings()]);
   return (
     <html lang="es-AR">
       <head>

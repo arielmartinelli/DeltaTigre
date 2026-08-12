@@ -8,7 +8,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { createSession, destroySession, getSession } from "@/lib/session";
+import { createSession, destroySession, getGuestSession, getOwnerSession } from "@/lib/session";
 import { uid, nightsBetween, bookingCode, money, prettyDate, rangesOverlap, isoToday } from "@/lib/utils";
 import { waLink, requestMessage, replyMessage } from "@/lib/whatsapp";
 import { getBusyRanges, TAG_CONTENIDO, TAG_RESERVAS } from "@/lib/data";
@@ -41,7 +41,7 @@ export async function registerAction(_prev: State, form: FormData): Promise<Stat
     role: "guest", createdAt: Date.now(),
   });
 
-  await createSession({ id, name, email, role: "guest" });
+  await createSession({ id, name, email, role: "guest" }, "guest");
   redirect("/mi-cuenta");
 }
 
@@ -54,8 +54,11 @@ export async function loginAction(_prev: State, form: FormData): Promise<State> 
   if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
     return { error: "Email o contrasena incorrectos" };
   }
-  await createSession({ id: user.id, name: user.name, email: user.email, role: user.role as "guest" | "owner" });
-  redirect(user.role === "owner" ? "/panel" : "/mi-cuenta");
+  if (user.role === "owner") {
+    return { error: "Esa es la cuenta del propietario. Entra por el acceso del panel." };
+  }
+  await createSession({ id: user.id, name: user.name, email: user.email, role: "guest" }, "guest");
+  redirect("/mi-cuenta");
 }
 
 /** Acceso exclusivo del propietario. Rechaza cuentas de huesped. */
@@ -71,13 +74,20 @@ export async function loginOwnerAction(_prev: State, form: FormData): Promise<St
   if (user.role !== "owner") {
     return { error: "Esa cuenta es de huesped. Ingresa desde el acceso de huespedes." };
   }
-  await createSession({ id: user.id, name: user.name, email: user.email, role: "owner" });
+  await createSession({ id: user.id, name: user.name, email: user.email, role: "owner" }, "owner");
   redirect("/panel");
 }
 
+/** Cierra la sesion de huesped. No toca la del propietario. */
 export async function logoutAction() {
-  await destroySession();
+  await destroySession("guest");
   redirect("/");
+}
+
+/** Cierra la sesion del propietario. No toca la del huesped. */
+export async function logoutOwnerAction() {
+  await destroySession("owner");
+  redirect("/propietario");
 }
 
 /* ============================== RESERVAS ============================== */
@@ -93,8 +103,8 @@ const bookingSchema = z.object({
 });
 
 export async function createBookingAction(_prev: State, form: FormData): Promise<State> {
-  const session = await getSession();
-  if (!session) return { error: "Necesitas una cuenta para solicitar la reserva.", code: "AUTH" };
+  const session = await getGuestSession();
+  if (!session) return { error: "Necesitas una cuenta de huesped para solicitar la reserva.", code: "AUTH" };
 
   const parsed = bookingSchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
@@ -147,7 +157,7 @@ export async function createBookingAction(_prev: State, form: FormData): Promise
 }
 
 export async function cancelBookingAction(formData: FormData) {
-  const session = await getSession();
+  const session = await getGuestSession();
   if (!session) throw new Error("No autorizado");
   const id = String(formData.get("id"));
   const b = await one(db.select().from(schema.bookings).where(eq(schema.bookings.id, id)).limit(1));
@@ -162,8 +172,8 @@ export async function cancelBookingAction(formData: FormData) {
 /* ====================== PANEL DEL PROPIETARIO ====================== */
 
 async function assertOwner() {
-  const s = await getSession();
-  if (!s || s.role !== "owner") throw new Error("No autorizado");
+  const s = await getOwnerSession();
+  if (!s) throw new Error("No autorizado: falta sesion de propietario");
   return s;
 }
 

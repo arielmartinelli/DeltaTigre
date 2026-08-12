@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { raw, withTimeout } from "@/lib/db";
-import { getSession } from "@/lib/session";
+import { getOwnerSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 20;
@@ -8,8 +8,8 @@ export const maxDuration = 20;
 /** Diagnostico: GET /api/health */
 export async function GET() {
   // Solo el propietario ve el detalle; para el resto es un ping mudo.
-  const session = await getSession();
-  if (session?.role !== "owner") {
+  const session = await getOwnerSession();
+  if (!session) {
     // Sin sesion de propietario solo se informa lo minimo para diagnosticar el login.
     try {
       const owners = await withTimeout(
@@ -18,7 +18,7 @@ export async function GET() {
       const total = await withTimeout(raw`select count(*)::int as n from users`, 8000, "users");
       return NextResponse.json({
         ok: true,
-        sesion: session ? `iniciada como ${session.role}` : "sin sesion",
+        sesion: "sin sesion de propietario",
         cuentasPropietario: owners[0].n,
         cuentasTotales: total[0].n,
       });

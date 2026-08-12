@@ -65,11 +65,11 @@ export default function Nav({ user }: { user: SessionUser | null }) {
 
           <div className="ml-auto flex items-center gap-2 md:ml-2">
             {user ? (
-              <Link href={user.role === "owner" ? "/panel" : "/mi-cuenta"}
+              <Link href="/mi-cuenta"
                 className="group hidden items-center gap-2 rounded-full bg-ink py-2 pl-4 pr-2 text-[13px] text-cream transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-palm-deep active:scale-[0.97] sm:flex">
-                <span>{user.role === "owner" ? "Panel" : user.name.split(" ")[0]}</span>
+                <span>{user.name.split(" ")[0]}</span>
                 <span className="grid h-7 w-7 place-items-center rounded-full bg-cream/12 transition-transform duration-500 group-hover:translate-x-0.5">
-                  <Icon name={user.role === "owner" ? "edit" : "users"} className="h-3.5 w-3.5" />
+                  <Icon name="users" className="h-3.5 w-3.5" />
                 </span>
               </Link>
             ) : (
@@ -98,7 +98,7 @@ export default function Nav({ user }: { user: SessionUser | null }) {
       >
         <div className="flex h-full flex-col justify-center px-8">
           {[...links, user
-            ? { href: user.role === "owner" ? "/panel" : "/mi-cuenta", label: user.role === "owner" ? "Panel del propietario" : "Mi cuenta" }
+            ? { href: "/mi-cuenta", label: "Mi cuenta" }
             : { href: "/ingresar", label: "Ingresar" }].map((l, i) => (
             <div key={l.href} className="overflow-hidden">
               <Link href={l.href}

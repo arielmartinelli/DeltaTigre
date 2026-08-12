@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Icon from "@/components/Icon";
-import { getSession } from "@/lib/session";
-import { logoutAction } from "@/app/actions";
+import { getOwnerSession } from "@/lib/session";
+import { logoutOwnerAction } from "@/app/actions";
 
 export const metadata: Metadata = { title: "Panel del propietario", robots: { index: false } };
 
@@ -14,9 +14,8 @@ const tabs = [
 ];
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSession();
+  const session = await getOwnerSession();
   if (!session) redirect("/propietario");
-  if (session.role !== "owner") redirect("/mi-cuenta");
 
   return (
     <div className="mx-auto max-w-6xl px-5 pb-24 pt-32 md:px-8 md:pt-36">
@@ -24,10 +23,11 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         <div>
           <span className="tag bg-palm-wash text-palm-deep"><span className="h-1 w-1 rounded-full bg-palm" />Panel del propietario</span>
           <h1 className="mt-4 font-display text-[clamp(1.9rem,4.6vw,3rem)] leading-none">Delta Tigre</h1>
+          <p className="mt-2 text-[13px] text-ink-45">{session.name} · {session.email}</p>
         </div>
         <div className="flex items-center gap-5">
-          <Link href="/" className="ul-slide text-[13px] text-ink-45 hover:text-ink">Ver el sitio</Link>
-          <form action={logoutAction}>
+          <Link href="/" target="_blank" className="ul-slide text-[13px] text-ink-45 hover:text-ink">Ver el sitio ↗</Link>
+          <form action={logoutOwnerAction}>
             <button className="ul-slide text-[13px] text-ink-45 hover:text-ink">Salir</button>
           </form>
         </div>

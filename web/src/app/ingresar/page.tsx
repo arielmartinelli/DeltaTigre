@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import AuthShell from "@/components/AuthShell";
 import AuthForm from "@/components/AuthForm";
-import { getSession } from "@/lib/session";
+import { getGuestSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Ingresar", robots: { index: false } };
 
 export default async function LoginPage() {
-  const s = await getSession();
-  if (s) redirect(s.role === "owner" ? "/panel" : "/mi-cuenta");
+  const s = await getGuestSession();
+  if (s) redirect("/mi-cuenta");
   return (
     <AuthShell
       eyebrow="Tu cuenta"

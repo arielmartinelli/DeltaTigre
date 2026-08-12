@@ -6,7 +6,7 @@ import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import { Eyebrow, StatusPill } from "@/components/Bits";
 import { CTA } from "@/components/Button";
-import { getSession } from "@/lib/session";
+import { getGuestSession } from "@/lib/session";
 import { getBookingsForUser, getProperties, getCovers } from "@/lib/data";
 import { cancelBookingAction, logoutAction } from "@/app/actions";
 import { money, prettyDate } from "@/lib/utils";
@@ -14,9 +14,8 @@ import { money, prettyDate } from "@/lib/utils";
 export const metadata: Metadata = { title: "Mi cuenta", robots: { index: false } };
 
 export default async function AccountPage() {
-  const session = await getSession();
+  const session = await getGuestSession();
   if (!session) redirect("/ingresar");
-  if (session.role === "owner") redirect("/panel");
 
   const [bookings, props] = await Promise.all([getBookingsForUser(session.id), getProperties()]);
   const covers = await getCovers(props.map((p) => p.id));

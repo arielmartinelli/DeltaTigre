@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import AuthForm from "@/components/AuthForm";
-import { getSession } from "@/lib/session";
+import { getOwnerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Acceso del propietario",
@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function OwnerLoginPage() {
-  const s = await getSession();
-  if (s?.role === "owner") redirect("/panel");
+  const s = await getOwnerSession();
+  if (s) redirect("/panel");
 
   return (
     <div className="relative min-h-[100dvh] bg-ink text-cream">
