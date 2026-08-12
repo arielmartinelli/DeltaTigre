@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
+import PageHead from "@/components/panel/PageHead";
 import Icon from "@/components/Icon";
 import { getProperties, getCovers } from "@/lib/data";
 import { money } from "@/lib/utils";
@@ -10,7 +11,13 @@ export default async function PanelProperties() {
   const covers = await getCovers(props.map((p) => p.id));
 
   return (
-    <div className="grid gap-5 md:grid-cols-2">
+    <>
+      <PageHead
+        eyebrow="Alojamientos"
+        title="Las dos casas"
+        description="Editá textos, precios, fotos y servicios de cada alojamiento."
+      />
+      <div className="grid gap-5 md:grid-cols-2">
       {props.map((p, i) => (
         <Reveal key={p.id} delay={i * 90} className="shell">
           <Link href={`/panel/cabanas/${p.id}`} className="core group block overflow-hidden">
@@ -37,7 +44,8 @@ export default async function PanelProperties() {
           </Link>
         </Reveal>
       ))}
-    </div>
+      </div>
+    </>
   );
 }
 

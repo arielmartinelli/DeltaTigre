@@ -1,5 +1,6 @@
 import SaveForm from "@/components/panel/SaveForm";
 import Icon from "@/components/Icon";
+import PageHead from "@/components/panel/PageHead";
 import { Field, inputCx } from "@/components/Bits";
 import { updateSettingsAction, saveActivityAction, deleteActivityAction } from "@/app/actions";
 import { getSettings, getActivities } from "@/lib/data";
@@ -9,6 +10,11 @@ export default async function ContentPanel() {
 
   return (
     <div className="space-y-14">
+      <PageHead
+        eyebrow="Sitio público"
+        title="Contenido"
+        description="Textos de la portada, datos de contacto y las experiencias del Delta."
+      />
       <section className="shell">
         <div className="core p-6 sm:p-8">
           <h3 className="text-[11px] uppercase tracking-[0.16em] text-ink-45">Portada y contacto</h3>
@@ -51,7 +57,7 @@ export default async function ContentPanel() {
                     </button>
                   </form>
                 </div>
-                <SaveForm action={saveActivityAction} label="Guardar" className="space-y-3">
+                <SaveForm action={saveActivityAction} label="Guardar" sticky={false} className="space-y-3">
                   <input type="hidden" name="id" value={a.id} />
                   <div className="grid gap-3 sm:grid-cols-3">
                     <Field label="Título"><input name="title" defaultValue={a.title} className={inputCx} /></Field>
@@ -74,7 +80,7 @@ export default async function ContentPanel() {
         <div className="mt-6 shell">
           <div className="core p-5 sm:p-6">
             <p className="font-display text-[19px]">Nueva experiencia</p>
-            <SaveForm action={saveActivityAction} label="Crear" className="mt-4 space-y-3">
+            <SaveForm action={saveActivityAction} label="Crear" sticky={false} className="mt-4 space-y-3">
               <div className="grid gap-3 sm:grid-cols-3">
                 <Field label="Título"><input name="title" required className={inputCx} /></Field>
                 <Field label="Etiqueta"><input name="tag" placeholder="Aire libre" className={inputCx} /></Field>

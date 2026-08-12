@@ -1,4 +1,5 @@
 import Reveal from "@/components/Reveal";
+import PageHead from "@/components/panel/PageHead";
 import Icon from "@/components/Icon";
 import BookingRow from "@/components/panel/BookingRow";
 import { getAllBookings, getProperties } from "@/lib/data";
@@ -14,6 +15,11 @@ export default async function PanelHome() {
 
   return (
     <div className="space-y-12">
+      <PageHead
+        eyebrow="Solicitudes"
+        title="Reservas"
+        description="Confirmá o rechazá las solicitudes. Al guardar se abre WhatsApp con la respuesta para el huésped."
+      />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
           ["cal", pend.length, "solicitudes nuevas"],

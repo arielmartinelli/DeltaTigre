@@ -146,6 +146,29 @@ async function _getBusyRanges(propertyId: string) {
   ];
 }
 
+/** Ocupacion detallada para el panel: quien, cuando y por que. Sin cache. */
+export async function getOccupancy(propertyId: string) {
+  const [reservas, bloqueos] = await Promise.all([
+    run(
+      () => db.select().from(schema.bookings)
+        .where(eq(schema.bookings.propertyId, propertyId))
+        .orderBy(asc(schema.bookings.checkIn)),
+      "ocupacion reservas"
+    ),
+    run(() => db.select().from(schema.blocks).where(eq(schema.blocks.propertyId, propertyId)), "ocupacion bloqueos"),
+  ]);
+  return {
+    reservas,
+    bloqueos,
+    ocupados: [
+      ...reservas
+        .filter((b) => b.status === "confirmada")
+        .map((b) => ({ from: b.checkIn, to: b.checkOut, reason: "Reservada", guest: b.guestName, code: b.code })),
+      ...bloqueos.map((b) => ({ from: b.fromDate, to: b.toDate, reason: b.reason })),
+    ],
+  };
+}
+
 export function groupAmenities(list: Amenity[]) {
   const featured = list.filter((a) => a.featured === 1);
   const rest = list.filter((a) => a.featured !== 1);

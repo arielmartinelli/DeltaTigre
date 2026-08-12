@@ -3,10 +3,10 @@ import { notFound } from "next/navigation";
 import SaveForm from "@/components/panel/SaveForm";
 import ImageManager from "@/components/panel/ImageManager";
 import Icon from "@/components/Icon";
+import PageHead from "@/components/panel/PageHead";
 import { Field, inputCx } from "@/components/Bits";
-import { updatePropertyAction, addAmenityAction, deleteAmenityAction, addBlockAction, deleteBlockAction } from "@/app/actions";
-import { getPropertyById, getImages, getAmenities, getBlocks } from "@/lib/data";
-import { prettyDate } from "@/lib/utils";
+import { updatePropertyAction, addAmenityAction, deleteAmenityAction } from "@/app/actions";
+import { getPropertyById, getImages, getAmenities } from "@/lib/data";
 
 const ICONS = ["check","wifi","river","snow","heat","fire","bbq","kitchen","utensils","fridge","microwave","oven","toaster","kettle","coffee","cleaning","bath","shower","bidet","toilet","tv","streaming","cable","balcony","terrace","patio","garden","beach","view","family","restaurant","bar","sofa","wardrobe","hanger","plug","floor","fan","hiking","kayak","fishing","boat","accessible","nosmoke","language","bed"];
 
@@ -15,15 +15,22 @@ export default async function EditProperty({ params }: { params: Promise<{ id: s
   const p = await getPropertyById(id);
   if (!p) notFound();
 
-  const [images, amenities, blocks] = await Promise.all([getImages(p.id), getAmenities(p.id), getBlocks(p.id)]);
+  const [images, amenities] = await Promise.all([getImages(p.id), getAmenities(p.id)]);
   const categories = [...new Set(amenities.map((a) => a.category))];
 
   return (
     <div className="space-y-16">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="font-display text-[clamp(1.6rem,3.6vw,2.4rem)]">{p.name}</h2>
-        <Link href={`/cabanas/${p.slug}`} target="_blank" className="ul-slide text-[13px] text-ink-45 hover:text-ink">Ver publicada ↗</Link>
-      </div>
+      <PageHead
+        eyebrow="Alojamiento"
+        title={p.name}
+        description="Los cambios se publican en el sitio apenas guardás."
+        action={
+          <div className="flex items-center gap-4">
+            <Link href="/panel/cabanas" className="ul-slide text-[13px] text-ink-45 hover:text-ink">← Volver</Link>
+            <Link href={`/cabanas/${p.slug}`} target="_blank" className="ul-slide text-[13px] text-ink-45 hover:text-ink">Ver publicada ↗</Link>
+          </div>
+        }
+      />
 
       {/* ---- Datos + precios ---- */}
       <section className="shell">
@@ -129,38 +136,11 @@ export default async function EditProperty({ params }: { params: Promise<{ id: s
         </div>
       </section>
 
-      {/* ---- Bloqueos de calendario ---- */}
-      <section className="shell">
-        <div className="core p-6 sm:p-8">
-          <h3 className="text-[11px] uppercase tracking-[0.16em] text-ink-45">Bloquear fechas</h3>
-          <p className="mt-2 text-[13.5px] text-ink-45">Las fechas bloqueadas no se pueden solicitar desde el sitio.</p>
+      <p className="rounded-2xl bg-palm-wash/60 px-5 py-4 text-[13.5px] leading-relaxed text-palm-deep">
+        Para bloquear fechas de {p.name}, entrá a <a href="/panel/fechas" className="ul-slide font-medium">Fechas disponibles</a>,
+        donde vas a ver el calendario completo y las próximas estadías.
+      </p>
 
-          <form action={addBlockAction} className="mt-5 grid gap-3 sm:grid-cols-12">
-            <input type="hidden" name="propertyId" value={p.id} />
-            <div className="sm:col-span-3"><input type="date" name="fromDate" required className={inputCx} /></div>
-            <div className="sm:col-span-3"><input type="date" name="toDate" required className={inputCx} /></div>
-            <div className="sm:col-span-4"><input name="reason" placeholder="Motivo" defaultValue="No disponible" className={inputCx} /></div>
-            <button className="rounded-full bg-ink px-4 py-2 text-[13px] text-cream transition-all duration-400 hover:bg-palm-deep active:scale-[0.97] sm:col-span-2">
-              Bloquear
-            </button>
-          </form>
-
-          {blocks.length > 0 && (
-            <ul className="mt-6 space-y-2">
-              {blocks.map((b) => (
-                <li key={b.id} className="flex items-center justify-between gap-4 rounded-xl bg-shell/70 px-4 py-2.5 text-[14px]">
-                  <span>{prettyDate(b.fromDate)} → {prettyDate(b.toDate)}</span>
-                  <span className="text-[12.5px] text-ink-45">{b.reason}</span>
-                  <form action={deleteBlockAction}>
-                    <input type="hidden" name="id" value={b.id} />
-                    <button aria-label="Quitar"><Icon name="trash" className="h-3.5 w-3.5 text-[#8a3a24]" /></button>
-                  </form>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
     </div>
   );
 }

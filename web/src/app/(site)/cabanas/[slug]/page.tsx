@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Gallery from "@/components/Gallery";
 import MapEmbed from "@/components/MapEmbed";
+import Calendar from "@/components/Calendar";
 import BookingForm from "@/components/BookingForm";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
@@ -162,6 +163,21 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Disponibilidad */}
+            <Reveal>
+              <Eyebrow>Disponibilidad</Eyebrow>
+              <h3 className="mt-5 font-display text-[clamp(1.6rem,3.4vw,2.2rem)]">Días libres y ocupados</h3>
+              <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-70">
+                Los días marcados ya están tomados. El resto se puede solicitar: elegí tus fechas en el
+                cuadro de reserva y te confirmamos por WhatsApp.
+              </p>
+              <div className="mt-7 shell">
+                <div className="core p-5 sm:p-7">
+                  <Calendar ocupados={busy} meses={2} />
                 </div>
               </div>
             </Reveal>
