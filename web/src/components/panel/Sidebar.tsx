@@ -89,7 +89,7 @@ export default function Sidebar({
       </aside>
 
       {/* Barra lateral fija en escritorio */}
-      <aside className="sticky top-0 hidden h-[100dvh] w-[264px] shrink-0 flex-col border-r border-ink/8 bg-paper px-4 py-7 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col overflow-y-auto border-r border-ink/8 bg-paper px-4 py-7 lg:flex">
         <MarcaPanel />
         <div className="mt-8">{nav}</div>
         {pie}

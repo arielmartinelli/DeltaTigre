@@ -16,14 +16,15 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   const pendientes = bookings.filter((b) => b.status === "pendiente").length;
 
   return (
-    <div className="flex min-h-[100dvh] bg-shell/50">
+    <div className="min-h-[100dvh] bg-shell/50">
       <Sidebar
         name={session.name}
         email={session.email}
         pendientes={pendientes}
         logout={logoutOwnerAction}
       />
-      <div className="min-w-0 flex-1">
+      {/* deja libre el ancho de la barra fija */}
+      <div className="lg:pl-[264px]">
         <div className="mx-auto max-w-5xl px-5 py-8 md:px-8 md:py-10">{children}</div>
       </div>
     </div>
