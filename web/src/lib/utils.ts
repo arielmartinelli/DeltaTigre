@@ -39,13 +39,44 @@ export function daysBetween(checkIn: string, checkOut: string): string[] {
   return out;
 }
 
-/** Suma el precio de cada noche, usando la tarifa del día si existe. */
+/** Precios generales por dia de la semana. 0 = usar el precio base. */
+export type PreciosSemana = {
+  basePrice: number;
+  priceMonThu?: number;
+  priceFri?: number;
+  priceSatSun?: number;
+};
+
+/**
+ * Precio de una noche. Prioridad:
+ *   1. tarifa especial de esa fecha
+ *   2. precio del dia de la semana
+ *   3. precio base
+ */
+export function priceForDay(day: string, p: PreciosSemana, rates: Record<string, number> = {}) {
+  const especial = rates[day];
+  if (especial) return especial;
+
+  const dow = new Date(day + "T00:00:00").getDay(); // 0 domingo ... 6 sabado
+  if (dow >= 1 && dow <= 4) return p.priceMonThu || p.basePrice;
+  if (dow === 5) return p.priceFri || p.basePrice;
+  return p.priceSatSun || p.basePrice;             // sabado y domingo
+}
+
+/** Precio mas bajo posible, para el "desde $X". */
+export function precioDesde(p: PreciosSemana, rates: Record<string, number> = {}) {
+  const valores = [p.priceMonThu, p.priceFri, p.priceSatSun, p.basePrice, ...Object.values(rates)]
+    .filter((v): v is number => typeof v === "number" && v > 0);
+  return valores.length ? Math.min(...valores) : p.basePrice;
+}
+
+/** Suma el precio de cada noche de la estadia. */
 export function quoteStay(
-  checkIn: string, checkOut: string, basePrice: number,
-  rates: Record<string, number>, cleaningFee = 0
+  checkIn: string, checkOut: string, precios: PreciosSemana,
+  rates: Record<string, number> = {}, cleaningFee = 0
 ) {
   const dias = daysBetween(checkIn, checkOut);
-  const noches = dias.map((d) => ({ day: d, price: rates[d] ?? basePrice }));
+  const noches = dias.map((d) => ({ day: d, price: priceForDay(d, precios, rates) }));
   const subtotal = noches.reduce((s, n) => s + n.price, 0);
   return { noches, nights: dias.length, subtotal, total: subtotal + cleaningFee };
 }

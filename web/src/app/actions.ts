@@ -88,6 +88,10 @@ export async function updatePropertyAction(_prev: State, form: FormData): Promis
   await assertOwner();
   const id = String(form.get("id"));
   const num = (k: string, d = 0) => { const v = Number(form.get(k)); return Number.isFinite(v) ? v : d; };
+
+  // el precio base es el mas bajo de la semana: alimenta el "desde $X"
+  const semana = [num("priceMonThu"), num("priceFri"), num("priceSatSun")].filter((v) => v > 0);
+  const base = semana.length ? Math.min(...semana) : num("basePrice");
   await db.update(schema.properties).set({
     name: String(form.get("name") ?? ""),
     kind: String(form.get("kind") ?? "Casa"),
@@ -97,7 +101,8 @@ export async function updatePropertyAction(_prev: State, form: FormData): Promis
     lat: num("lat", -34.418), lng: num("lng", -58.579),
     sizeM2: num("sizeM2"), bedrooms: num("bedrooms", 1), bathrooms: num("bathrooms", 1),
     beds: num("beds", 1), maxGuests: num("maxGuests", 2),
-    basePrice: num("basePrice"), highPrice: num("highPrice"), cleaningFee: num("cleaningFee"),
+    basePrice: base, highPrice: num("highPrice"), cleaningFee: num("cleaningFee"),
+    priceMonThu: num("priceMonThu"), priceFri: num("priceFri"), priceSatSun: num("priceSatSun"),
     minNights: num("minNights", 1), rating: num("rating"), reviews: num("reviews"),
     checkIn: String(form.get("checkIn") ?? ""), checkOut: String(form.get("checkOut") ?? ""),
     active: form.get("active") ? 1 : 0,
@@ -327,7 +332,7 @@ export async function createManualBookingAction(_prev: State, form: FormData): P
   let estimate = d.estimate;
   if (!estimate) {
     const rates = await getRates(d.propertyId);
-    estimate = quoteStay(d.checkIn, d.checkOut, property.basePrice, rates, property.cleaningFee).total;
+    estimate = quoteStay(d.checkIn, d.checkOut, property, rates, property.cleaningFee).total;
   }
 
   const now = Date.now();

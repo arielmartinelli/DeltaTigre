@@ -50,7 +50,9 @@ export default async function PanelHome() {
         <NuevaReserva
           casas={props.map((p) => ({
             id: p.id, name: p.name, maxGuests: p.maxGuests,
-            basePrice: p.basePrice, cleaningFee: p.cleaningFee, minNights: p.minNights,
+            cleaningFee: p.cleaningFee, minNights: p.minNights,
+            basePrice: p.basePrice, priceMonThu: p.priceMonThu,
+            priceFri: p.priceFri, priceSatSun: p.priceSatSun,
           }))}
           rates={rates}
         />

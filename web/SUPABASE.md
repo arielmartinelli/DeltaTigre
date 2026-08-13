@@ -7,7 +7,8 @@ base de Supabase; no hay dos drivers ni dos esquemas.
 
 ## 0. Si ya tenías el sitio funcionando
 
-Ejecutá `drizzle/migracion-tarifas.sql` en el **SQL Editor**. Crea la tabla `rates`
+Ejecutá en el **SQL Editor**, en este orden, `drizzle/migracion-tarifas.sql` y
+`drizzle/migracion-precios-semana.sql`. Crea la tabla `rates`
 (precio por día) y hace opcional el email del huésped, porque las reservas ahora las
 carga el propietario.
 

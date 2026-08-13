@@ -4,6 +4,7 @@ import SaveForm from "@/components/panel/SaveForm";
 import ImageManager from "@/components/panel/ImageManager";
 import Icon from "@/components/Icon";
 import PageHead from "@/components/panel/PageHead";
+import PreciosDialog from "@/components/panel/PreciosDialog";
 import { Field, inputCx } from "@/components/Bits";
 import { updatePropertyAction, addAmenityAction, deleteAmenityAction } from "@/app/actions";
 import { getPropertyById, getImages, getAmenities } from "@/lib/data";
@@ -38,6 +39,7 @@ export default async function EditProperty({ params }: { params: Promise<{ id: s
           <h3 className="text-[11px] uppercase tracking-[0.16em] text-ink-45">Datos y precios</h3>
           <SaveForm action={updatePropertyAction} className="mt-6">
             <input type="hidden" name="id" value={p.id} />
+            <input type="hidden" name="highPrice" value={p.highPrice} />
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Nombre"><input name="name" defaultValue={p.name} className={inputCx} /></Field>
               <Field label="Tipo"><input name="kind" defaultValue={p.kind} className={inputCx} /></Field>
@@ -60,11 +62,16 @@ export default async function EditProperty({ params }: { params: Promise<{ id: s
               <Field label="Baños"><input name="bathrooms" type="number" defaultValue={p.bathrooms} className={inputCx} /></Field>
               <Field label="Camas"><input name="beds" type="number" defaultValue={p.beds} className={inputCx} /></Field>
               <Field label="Huéspedes máximo"><input name="maxGuests" type="number" defaultValue={p.maxGuests} className={inputCx} /></Field>
-              <Field label="Noches mínimas"><input name="minNights" type="number" defaultValue={p.minNights} className={inputCx} /></Field>
 
-              <Field label="Precio por noche (ARS)"><input name="basePrice" type="number" defaultValue={p.basePrice} className={inputCx} /></Field>
-              <Field label="Precio temporada alta"><input name="highPrice" type="number" defaultValue={p.highPrice} className={inputCx} /></Field>
-              <Field label="Limpieza final"><input name="cleaningFee" type="number" defaultValue={p.cleaningFee} className={inputCx} /></Field>
+              <div className="sm:col-span-2">
+                <PreciosDialog
+                  monThu={p.priceMonThu || p.basePrice}
+                  fri={p.priceFri || p.basePrice}
+                  satSun={p.priceSatSun || p.basePrice}
+                  cleaningFee={p.cleaningFee}
+                  minNights={p.minNights}
+                />
+              </div>
               <Field label="Puntaje (0-10)"><input name="rating" type="number" step="0.1" defaultValue={p.rating} className={inputCx} /></Field>
               <Field label="Cantidad de opiniones"><input name="reviews" type="number" defaultValue={p.reviews} className={inputCx} /></Field>
               <Field label="Horario check-in"><input name="checkIn" defaultValue={p.checkIn} className={inputCx} /></Field>

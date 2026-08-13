@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import Icon from "./Icon";
 import { inputCx } from "./Bits";
 import Calendar, { type Ocupacion } from "./Calendar";
-import { money, prettyDate, rangesOverlap, quoteStay } from "@/lib/utils";
+import { money, prettyDate, rangesOverlap, quoteStay, precioDesde } from "@/lib/utils";
 import { waLink, consultaMessage } from "@/lib/whatsapp";
 import type { Property } from "@/lib/data";
 
@@ -26,7 +26,7 @@ export default function ConsultaForm({
 
   const cotizacion = useMemo(
     () => (checkIn && checkOut
-      ? quoteStay(checkIn, checkOut, property.basePrice, rates, property.cleaningFee)
+      ? quoteStay(checkIn, checkOut, property, rates, property.cleaningFee)
       : null),
     [checkIn, checkOut, rates, property]
   );
@@ -60,8 +60,7 @@ export default function ConsultaForm({
       }))
     : null;
 
-  // precio de referencia: el menor entre el base y las tarifas cargadas
-  const desde = Math.min(property.basePrice, ...Object.values(rates).filter((v) => v > 0));
+  const desde = precioDesde(property, rates);
 
   return (
     <div className="shell">

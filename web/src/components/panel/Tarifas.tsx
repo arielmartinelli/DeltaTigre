@@ -17,14 +17,14 @@ export default function Tarifas({
   return (
     <div>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="text-[11px] uppercase tracking-[0.16em] text-ink-45">Precio por día</p>
+        <p className="text-[11px] uppercase tracking-[0.16em] text-ink-45">Tarifas especiales</p>
         <p className="text-[12px] text-ink-45">
-          Base: <span className="font-medium text-ink">{money(basePrice)}</span>
+          Desde: <span className="font-medium text-ink">{money(basePrice)}</span>
         </p>
       </div>
       <p className="mt-2 text-[12.5px] leading-relaxed text-ink-45">
-        Los días sin tarifa propia se cobran al precio base. Cargá un rango para fines de semana,
-        feriados o temporada alta.
+        Pisan el precio general de la semana en fechas puntuales: feriados, Semana Santa,
+        temporada alta. Los días sin tarifa especial usan el precio del día que corresponda.
       </p>
 
       <form action={action} className="mt-3 grid gap-2 sm:grid-cols-2">

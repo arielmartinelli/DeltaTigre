@@ -5,7 +5,10 @@ import { inputCx, Field } from "@/components/Bits";
 import Icon from "@/components/Icon";
 import { isoToday, nightsBetween, money, quoteStay } from "@/lib/utils";
 
-type Casa = { id: string; name: string; maxGuests: number; basePrice: number; cleaningFee: number; minNights: number };
+type Casa = {
+  id: string; name: string; maxGuests: number; cleaningFee: number; minNights: number;
+  basePrice: number; priceMonThu: number; priceFri: number; priceSatSun: number;
+};
 
 /** Carga manual de una reserva. Al confirmarla, esas fechas se cierran en el sitio. */
 export default function NuevaReserva({
@@ -20,7 +23,7 @@ export default function NuevaReserva({
   const casa = casas.find((c) => c.id === propertyId);
   const noches = checkIn && checkOut ? nightsBetween(checkIn, checkOut) : 0;
   const sugerido = casa && noches > 0
-    ? quoteStay(checkIn, checkOut, casa.basePrice, rates[casa.id] ?? {}, casa.cleaningFee).total
+    ? quoteStay(checkIn, checkOut, casa, rates[casa.id] ?? {}, casa.cleaningFee).total
     : 0;
 
   if (state.ok && !abierto) {

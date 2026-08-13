@@ -223,7 +223,8 @@ async function main() {
         "Delta Uno es una cabana de 90 m2 levantada sobre pilotes, a metros del agua. Tiene dos dormitorios, un estar integrado con cocina totalmente equipada, aire acondicionado frio-calor y un deck de madera que rodea la casa y baja hasta el arroyo. Desde la cama se escucha el rio.\n\nEl jardin y el muelle son compartidos, con arboles anosos, parrilla y bajada al arroyo. A cien metros hay restaurantes y bar sobre la costa, y la lancha colectiva pasa por el muelle.",
       address: "Arroyo Gambado 486, 1648 Tigre, Buenos Aires", lat: -34.4128, lng: -58.5793,
       sizeM2: 90, bedrooms: 2, bathrooms: 1, beds: 4, maxGuests: 6,
-      basePrice: 85000, highPrice: 110000, cleaningFee: 15000, minNights: 2,
+      basePrice: 85000, priceMonThu: 85000, priceFri: 95000, priceSatSun: 110000,
+      highPrice: 110000, cleaningFee: 15000, minNights: 2,
       rating: 9.6, reviews: 38, active: 1, sortOrder: 1,
     },
     {
@@ -233,7 +234,8 @@ async function main() {
         "Delta Dos es la casa grande: 160 m2 con living comedor de doble altura, chimenea a lena, cocina completa y una galeria techada que recorre todo el frente, con hamacas paraguayas y mesa larga para comer afuera.\n\nTiene dos dormitorios matrimoniales en planta baja y un altillo con camas para grupos, ademas de un bano completo con banera. Afuera: parrilla, fogon, patio y bajada al arroyo.",
       address: "Arroyo Gambado 147, 1648 Tigre, Buenos Aires", lat: -34.4155, lng: -58.5821,
       sizeM2: 160, bedrooms: 3, bathrooms: 1, beds: 8, maxGuests: 10,
-      basePrice: 145000, highPrice: 190000, cleaningFee: 22000, minNights: 2,
+      basePrice: 145000, priceMonThu: 145000, priceFri: 165000, priceSatSun: 190000,
+      highPrice: 190000, cleaningFee: 22000, minNights: 2,
       rating: 9.7, reviews: 46, active: 1, sortOrder: 2,
     },
   ]);

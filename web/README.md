@@ -108,12 +108,12 @@ No se guarda nada en la base al consultar: el sitio público es solo lectura.
 
 - **Reservas** — métricas, carga manual de reservas y cambio de estado. Una reserva
   *confirmada* cierra sus fechas en el sitio; una *pendiente* no.
-- **Fechas disponibles** — calendario por casa, bloqueo de períodos, **precio por día**
-  (fines de semana, feriados, temporada) y listado de próximas estadías con nombre del huésped.
+- **Fechas disponibles** — calendario por casa, bloqueo de períodos, **tarifas especiales**
+  por fecha (feriados, temporada alta) y próximas estadías con nombre del huésped.
 - **Alojamientos** — por cada casa:
   - textos, dirección, coordenadas del mapa, metros, dormitorios, baños, capacidad
-  - **precios**: base por noche, limpieza final, noches mínimas
-    (el precio de cada fecha se ajusta en *Fechas disponibles*)
+  - **precios**: una ventana flotante con el valor de lunes a jueves, viernes, y sábado
+    y domingo, más la limpieza final y las noches mínimas
   - **fotos**: subir, reordenar, editar descripción, borrar (la primera es la portada)
   - **servicios**: agregar/quitar, elegir ícono, marcar como destacado
   - publicar u ocultar la casa
