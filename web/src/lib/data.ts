@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { db, schema, run } from "./db";
 import { eq, asc, desc, and, inArray } from "drizzle-orm";
+import type { PreciosPorPersona } from "./utils";
 
 /**
  * La base esta en otra region, asi que cada consulta cuesta latencia.
@@ -164,6 +165,22 @@ async function _getRates(propertyId: string) {
   }
 }
 
+/** Precio por cantidad de huespedes: { 4: { monThu, fri, satSun } } */
+async function _getGuestPrices(propertyId: string) {
+  try {
+    const filas = await run(
+      () => db.select().from(schema.guestPrices).where(eq(schema.guestPrices.propertyId, propertyId)),
+      "precios por persona"
+    );
+    return Object.fromEntries(
+      filas.map((f) => [f.guests, { monThu: f.priceMonThu, fri: f.priceFri, satSun: f.priceSatSun }])
+    ) as PreciosPorPersona;
+  } catch (e) {
+    console.error("[precios por persona] no disponibles:", e instanceof Error ? e.message : e);
+    return {} as PreciosPorPersona;
+  }
+}
+
 /** Tarifas con su id, para editarlas en el panel. Sin cache. */
 export async function getRateRows(propertyId: string) {
   try {
@@ -229,3 +246,4 @@ export const getActivities = cache(_getActivities, "getActivities", [TAG_CONTENI
 export const getBlocks = cache(_getBlocks, "getBlocks", [TAG_RESERVAS]);
 export const getBusyRanges = cache(_getBusyRanges, "getBusyRanges", [TAG_RESERVAS]);
 export const getRates = cache(_getRates, "getRates", [TAG_CONTENIDO]);
+export const getGuestPrices = cache(_getGuestPrices, "getGuestPrices", [TAG_CONTENIDO]);

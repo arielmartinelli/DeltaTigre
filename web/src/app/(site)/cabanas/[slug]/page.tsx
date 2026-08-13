@@ -12,7 +12,7 @@ import { CTA } from "@/components/Button";
 import {
   getPropertyBySlug, getImages, getAmenities, getRules, getNearby,
   getBusyRanges, groupAmenities, getActiveProperties, getActivities,
-  getRates, getSettings,
+  getRates, getGuestPrices, getSettings,
 } from "@/lib/data";
 
 export async function generateStaticParams() {
@@ -45,6 +45,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
     getBusyRanges(p.id), getActivities(), getActiveProperties(),
     getRates(p.id), getSettings(),
   ]);
+  const porPersona = await getGuestPrices(p.id);
   const { featured, groups } = groupAmenities(amenities);
   const other = all.find((x) => x.id !== p.id);
 
@@ -218,6 +219,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                   property={p}
                   busy={busy}
                   rates={rates}
+                  porPersona={porPersona}
                   whatsapp={settings.whatsapp ?? "5491100000000"}
                 />
               </Reveal>

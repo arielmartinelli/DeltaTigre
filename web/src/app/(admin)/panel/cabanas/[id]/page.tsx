@@ -7,7 +7,7 @@ import PageHead from "@/components/panel/PageHead";
 import PreciosDialog from "@/components/panel/PreciosDialog";
 import { Field, inputCx } from "@/components/Bits";
 import { updatePropertyAction, addAmenityAction, deleteAmenityAction } from "@/app/actions";
-import { getPropertyById, getImages, getAmenities } from "@/lib/data";
+import { getPropertyById, getImages, getAmenities, getGuestPrices } from "@/lib/data";
 
 const ICONS = ["check","wifi","river","snow","heat","fire","bbq","kitchen","utensils","fridge","microwave","oven","toaster","kettle","coffee","cleaning","bath","shower","bidet","toilet","tv","streaming","cable","balcony","terrace","patio","garden","beach","view","family","restaurant","bar","sofa","wardrobe","hanger","plug","floor","fan","hiking","kayak","fishing","boat","accessible","nosmoke","language","bed"];
 
@@ -16,7 +16,9 @@ export default async function EditProperty({ params }: { params: Promise<{ id: s
   const p = await getPropertyById(id);
   if (!p) notFound();
 
-  const [images, amenities] = await Promise.all([getImages(p.id), getAmenities(p.id)]);
+  const [images, amenities, porPersona] = await Promise.all([
+    getImages(p.id), getAmenities(p.id), getGuestPrices(p.id),
+  ]);
   const categories = [...new Set(amenities.map((a) => a.category))];
 
   return (
@@ -70,6 +72,8 @@ export default async function EditProperty({ params }: { params: Promise<{ id: s
                   satSun={p.priceSatSun || p.basePrice}
                   cleaningFee={p.cleaningFee}
                   minNights={p.minNights}
+                  maxGuests={p.maxGuests}
+                  porPersona={porPersona}
                 />
               </div>
               <Field label="Puntaje (0-10)"><input name="rating" type="number" step="0.1" defaultValue={p.rating} className={inputCx} /></Field>

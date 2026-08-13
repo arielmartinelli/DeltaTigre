@@ -11,7 +11,7 @@ import { db, schema } from "@/lib/db";
 import { createSession, destroySession, getOwnerSession } from "@/lib/session";
 import { uid, nightsBetween, bookingCode, money, prettyDate, rangesOverlap, isoToday, quoteStay, daysBetween } from "@/lib/utils";
 import { waLink, replyMessage } from "@/lib/whatsapp";
-import { getBusyRanges, getRates, TAG_CONTENIDO, TAG_RESERVAS } from "@/lib/data";
+import { getBusyRanges, getRates, getGuestPrices, TAG_CONTENIDO, TAG_RESERVAS } from "@/lib/data";
 
 export type State = { ok?: boolean; error?: string; message?: string; waUrl?: string; code?: string };
 
@@ -107,6 +107,28 @@ export async function updatePropertyAction(_prev: State, form: FormData): Promis
     checkIn: String(form.get("checkIn") ?? ""), checkOut: String(form.get("checkOut") ?? ""),
     active: form.get("active") ? 1 : 0,
   }).where(eq(schema.properties.id, id));
+
+  // precios por cantidad de huespedes: campos gp_<n>_<franja>
+  const porPersona = new Map<number, { monThu: number; fri: number; satSun: number }>();
+  for (const [k, v] of form.entries()) {
+    const m = /^gp_(\d+)_(monThu|fri|satSun)$/.exec(k);
+    if (!m) continue;
+    const n = Number(m[1]);
+    const fila = porPersona.get(n) ?? { monThu: 0, fri: 0, satSun: 0 };
+    fila[m[2] as "monThu" | "fri" | "satSun"] = Number(v) || 0;
+    porPersona.set(n, fila);
+  }
+
+  if (porPersona.size) {
+    await db.delete(schema.guestPrices).where(eq(schema.guestPrices.propertyId, id));
+    const filas = [...porPersona.entries()]
+      .filter(([, f]) => f.monThu > 0 || f.fri > 0 || f.satSun > 0)
+      .map(([guests, f]) => ({
+        id: uid(), propertyId: id, guests,
+        priceMonThu: f.monThu, priceFri: f.fri, priceSatSun: f.satSun,
+      }));
+    if (filas.length) await db.insert(schema.guestPrices).values(filas);
+  }
 
   revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
@@ -332,7 +354,11 @@ export async function createManualBookingAction(_prev: State, form: FormData): P
   let estimate = d.estimate;
   if (!estimate) {
     const rates = await getRates(d.propertyId);
-    estimate = quoteStay(d.checkIn, d.checkOut, property, rates, property.cleaningFee).total;
+    const porPersona = await getGuestPrices(d.propertyId);
+    estimate = quoteStay(
+      d.checkIn, d.checkOut, property, rates, property.cleaningFee,
+      d.adults + d.children, porPersona
+    ).total;
   }
 
   const now = Date.now();

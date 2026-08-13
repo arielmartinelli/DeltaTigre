@@ -4,6 +4,7 @@ import { createManualBookingAction, type State } from "@/app/actions";
 import { inputCx, Field } from "@/components/Bits";
 import Icon from "@/components/Icon";
 import { isoToday, nightsBetween, money, quoteStay } from "@/lib/utils";
+import type { PreciosPorPersona } from "@/lib/utils";
 
 type Casa = {
   id: string; name: string; maxGuests: number; cleaningFee: number; minNights: number;
@@ -12,18 +13,25 @@ type Casa = {
 
 /** Carga manual de una reserva. Al confirmarla, esas fechas se cierran en el sitio. */
 export default function NuevaReserva({
-  casas, rates,
-}: { casas: Casa[]; rates: Record<string, Record<string, number>> }) {
+  casas, rates, porPersona,
+}: {
+  casas: Casa[]; rates: Record<string, Record<string, number>>;
+  porPersona: Record<string, PreciosPorPersona>;
+}) {
   const [state, action, pending] = useActionState<State, FormData>(createManualBookingAction, {});
   const [abierto, setAbierto] = useState(false);
   const [propertyId, setPropertyId] = useState(casas[0]?.id ?? "");
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
+  const [huespedes, setHuespedes] = useState(2);
 
   const casa = casas.find((c) => c.id === propertyId);
   const noches = checkIn && checkOut ? nightsBetween(checkIn, checkOut) : 0;
   const sugerido = casa && noches > 0
-    ? quoteStay(checkIn, checkOut, casa, rates[casa.id] ?? {}, casa.cleaningFee).total
+    ? quoteStay(
+        checkIn, checkOut, casa, rates[casa.id] ?? {}, casa.cleaningFee,
+        huespedes, porPersona[casa.id] ?? {}
+      ).total
     : 0;
 
   if (state.ok && !abierto) {
@@ -80,7 +88,8 @@ export default function NuevaReserva({
                 </Field>
 
                 <Field label="Adultos">
-                  <input name="adults" type="number" min={1} max={casa?.maxGuests ?? 20} defaultValue={2} className={inputCx} />
+                  <input name="adults" type="number" min={1} max={casa?.maxGuests ?? 20} defaultValue={2}
+                    onChange={(e) => setHuespedes(Number(e.target.value) || 1)} className={inputCx} />
                 </Field>
                 <Field label="Menores">
                   <input name="children" type="number" min={0} max={casa?.maxGuests ?? 20} defaultValue={0} className={inputCx} />

@@ -71,6 +71,13 @@ create table if not exists rates (
   day text not null, price int not null, unique (property_id, day)
 );
 
+create table if not exists guest_prices (
+  id text primary key, property_id text not null references properties(id) on delete cascade,
+  guests int not null, price_mon_thu int not null default 0,
+  price_fri int not null default 0, price_sat_sun int not null default 0,
+  unique (property_id, guests)
+);
+
 create table if not exists settings (key text primary key, value text not null default '');
 
 create index if not exists idx_img_prop on images(property_id);

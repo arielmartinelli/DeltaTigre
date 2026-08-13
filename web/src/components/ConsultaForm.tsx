@@ -4,6 +4,7 @@ import Icon from "./Icon";
 import { inputCx } from "./Bits";
 import Calendar, { type Ocupacion } from "./Calendar";
 import { money, prettyDate, rangesOverlap, quoteStay, precioDesde } from "@/lib/utils";
+import type { PreciosPorPersona } from "@/lib/utils";
 import { waLink, consultaMessage } from "@/lib/whatsapp";
 import type { Property } from "@/lib/data";
 
@@ -12,8 +13,11 @@ import type { Property } from "@/lib/data";
  * No escribe nada en la base.
  */
 export default function ConsultaForm({
-  property, busy, rates, whatsapp,
-}: { property: Property; busy: Ocupacion[]; rates: Record<string, number>; whatsapp: string }) {
+  property, busy, rates, porPersona, whatsapp,
+}: {
+  property: Property; busy: Ocupacion[]; rates: Record<string, number>;
+  porPersona: PreciosPorPersona; whatsapp: string;
+}) {
   const [nombre, setNombre] = useState("");
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
@@ -26,9 +30,9 @@ export default function ConsultaForm({
 
   const cotizacion = useMemo(
     () => (checkIn && checkOut
-      ? quoteStay(checkIn, checkOut, property, rates, property.cleaningFee)
+      ? quoteStay(checkIn, checkOut, property, rates, property.cleaningFee, guests, porPersona)
       : null),
-    [checkIn, checkOut, rates, property]
+    [checkIn, checkOut, rates, property, guests, porPersona]
   );
 
   const error = useMemo(() => {
@@ -60,7 +64,7 @@ export default function ConsultaForm({
       }))
     : null;
 
-  const desde = precioDesde(property, rates);
+  const desde = precioDesde(property, rates, porPersona);
 
   return (
     <div className="shell">
@@ -128,7 +132,10 @@ export default function ConsultaForm({
           {cotizacion && cotizacion.nights > 0 && (
             <div className="space-y-1.5 rounded-2xl bg-shell/70 p-3.5 text-[13px]">
               <div className="flex justify-between text-ink-70">
-                <span>{cotizacion.nights} noche{cotizacion.nights > 1 ? "s" : ""}</span>
+                <span>
+                  {cotizacion.nights} noche{cotizacion.nights > 1 ? "s" : ""}
+                  <span className="text-ink-45"> · {guests} huésped{guests > 1 ? "es" : ""}</span>
+                </span>
                 <span className="tabular-nums">{money(cotizacion.subtotal, property.currency)}</span>
               </div>
               {property.cleaningFee > 0 && (

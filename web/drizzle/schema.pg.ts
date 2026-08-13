@@ -131,3 +131,12 @@ export const rates = pgTable("rates", {
   day: text("day").notNull(),
   price: integer("price").notNull(),
 });
+
+export const guestPrices = pgTable("guest_prices", {
+  id: text("id").primaryKey(),
+  propertyId: text("property_id").notNull(),
+  guests: integer("guests").notNull(),
+  priceMonThu: integer("price_mon_thu").notNull().default(0),
+  priceFri: integer("price_fri").notNull().default(0),
+  priceSatSun: integer("price_sat_sun").notNull().default(0),
+});

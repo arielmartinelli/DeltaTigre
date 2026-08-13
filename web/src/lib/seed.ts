@@ -210,6 +210,7 @@ async function main() {
   await db.delete(schema.bookings);
   await db.delete(schema.blocks);
   await db.delete(schema.properties);
+  await db.delete(schema.guestPrices);
   await db.delete(schema.settings);
 
   const unoId = "prop_delta_uno";

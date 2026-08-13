@@ -3,7 +3,7 @@ import Icon from "@/components/Icon";
 import PageHead from "@/components/panel/PageHead";
 import BookingRow from "@/components/panel/BookingRow";
 import NuevaReserva from "@/components/panel/NuevaReserva";
-import { getAllBookings, getProperties, getRates } from "@/lib/data";
+import { getAllBookings, getProperties, getRates, getGuestPrices } from "@/lib/data";
 import { money, isoToday } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +13,9 @@ export default async function PanelHome() {
   const [bookings, props] = await Promise.all([getAllBookings(), getProperties()]);
   const rates = Object.fromEntries(
     await Promise.all(props.map(async (p) => [p.id, await getRates(p.id)] as const))
+  );
+  const porPersona = Object.fromEntries(
+    await Promise.all(props.map(async (p) => [p.id, await getGuestPrices(p.id)] as const))
   );
   const byId = Object.fromEntries(props.map((p) => [p.id, p]));
   const hoy = isoToday();
@@ -55,6 +58,7 @@ export default async function PanelHome() {
             priceFri: p.priceFri, priceSatSun: p.priceSatSun,
           }))}
           rates={rates}
+          porPersona={porPersona}
         />
 
         <section>

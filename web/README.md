@@ -112,8 +112,9 @@ No se guarda nada en la base al consultar: el sitio público es solo lectura.
   por fecha (feriados, temporada alta) y próximas estadías con nombre del huésped.
 - **Alojamientos** — por cada casa:
   - textos, dirección, coordenadas del mapa, metros, dormitorios, baños, capacidad
-  - **precios**: una ventana flotante con el valor de lunes a jueves, viernes, y sábado
-    y domingo, más la limpieza final y las noches mínimas
+  - **precios**: una ventana flotante con dos niveles — el valor de lunes a jueves,
+    viernes, y sábado y domingo; y una tabla con el precio para cada cantidad de
+    huéspedes. Más la limpieza final y las noches mínimas
   - **fotos**: subir, reordenar, editar descripción, borrar (la primera es la portada)
   - **servicios**: agregar/quitar, elegir ícono, marcar como destacado
   - publicar u ocultar la casa
