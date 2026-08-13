@@ -39,11 +39,13 @@ no vuelve a pedir la contraseña hasta que se cierre desde el panel.
 
 > **Cambiá esa contraseña antes de publicar el sitio**, porque figura en este archivo:
 >
+> Se cambia desde **Panel → Mi cuenta**, o desde la terminal:
+>
 > ```bash
 > npm run owner -- propietario@deltatigre.com.ar "TuNuevaClave"
 > ```
 >
-> El mismo comando sirve para crear otro usuario propietario o recuperar el acceso.
+> El comando sirve además para recuperar el acceso si perdés la contraseña.
 
 ### Variables de entorno (`.env`)
 
@@ -116,6 +118,7 @@ No se guarda nada en la base al consultar: el sitio público es solo lectura.
   - **servicios**: agregar/quitar, elegir ícono, marcar como destacado
   - publicar u ocultar la casa
 - **Contenido** — textos de la portada, WhatsApp, email, Instagram y las experiencias.
+- **Mi cuenta** — cambiar el email y la contraseña de acceso al panel.
 
 ---
 

@@ -10,6 +10,7 @@ const items = [
   { href: "/panel/fechas", label: "Fechas disponibles", icon: "clock" },
   { href: "/panel/cabanas", label: "Alojamientos", icon: "home" },
   { href: "/panel/contenido", label: "Contenido", icon: "edit" },
+  { href: "/panel/cuenta", label: "Mi cuenta", icon: "users" },
 ];
 
 export default function Sidebar({
@@ -50,8 +51,10 @@ export default function Sidebar({
         <Icon name="view" className="h-4 w-4" />Ver el sitio
       </Link>
       <div className="rounded-2xl bg-ink/4 px-4 py-3">
-        <p className="truncate text-[13px] font-medium">{name}</p>
-        <p className="truncate text-[11.5px] text-ink-45">{email}</p>
+        <Link href="/panel/cuenta" className="block">
+          <span className="block truncate text-[13px] font-medium">{name}</span>
+          <span className="block truncate text-[11.5px] text-ink-45">{email}</span>
+        </Link>
         <form action={logout} className="mt-2">
           <button className="ul-slide text-[12px] text-ink-45 transition-colors hover:text-ink">Cerrar sesión</button>
         </form>

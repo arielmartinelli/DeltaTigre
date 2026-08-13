@@ -396,3 +396,59 @@ export async function clearRatesAction(form: FormData) {
   revalidateTag(TAG_CONTENIDO);
   revalidatePath("/", "layout");
 }
+
+/* ==================== CUENTA DEL PROPIETARIO ==================== */
+
+const cuentaSchema = z.object({
+  name: z.string().trim().min(2, "Ingresá tu nombre"),
+  email: z.string().trim().toLowerCase().email("Email inválido"),
+  actual: z.string().min(1, "Ingresá tu contraseña actual"),
+  nueva: z.string().optional().default(""),
+  repetir: z.string().optional().default(""),
+});
+
+/**
+ * Cambia nombre, email y/o contraseña del propietario.
+ * Siempre pide la contraseña actual antes de tocar nada.
+ */
+export async function updateOwnerAccountAction(_prev: State, form: FormData): Promise<State> {
+  const session = await assertOwner();
+
+  const parsed = cuentaSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const { name, email, actual, nueva, repetir } = parsed.data;
+
+  const user = await one(db.select().from(schema.users).where(eq(schema.users.id, session.id)).limit(1));
+  if (!user) return { error: "No encontramos tu cuenta" };
+
+  if (!bcrypt.compareSync(actual, user.passwordHash)) {
+    return { error: "La contraseña actual no es correcta" };
+  }
+
+  if (email !== user.email) {
+    const ocupado = await one(db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1));
+    if (ocupado && ocupado.id !== user.id) return { error: "Ya existe otra cuenta con ese email" };
+  }
+
+  const cambios: { name: string; email: string; passwordHash?: string } = { name, email };
+
+  if (nueva || repetir) {
+    if (nueva.length < 8) return { error: "La contraseña nueva necesita al menos 8 caracteres" };
+    if (nueva !== repetir) return { error: "Las contraseñas nuevas no coinciden" };
+    if (bcrypt.compareSync(nueva, user.passwordHash)) {
+      return { error: "La contraseña nueva tiene que ser distinta de la actual" };
+    }
+    cambios.passwordHash = bcrypt.hashSync(nueva, 10);
+  }
+
+  await db.update(schema.users).set(cambios).where(eq(schema.users.id, user.id));
+
+  // el nombre y el email viajan en la cookie: hay que reemitirla
+  await createSession({ id: user.id, name, email, role: "owner" }, true);
+
+  revalidatePath("/panel", "layout");
+  return {
+    ok: true,
+    message: cambios.passwordHash ? "Datos y contraseña actualizados" : "Datos actualizados",
+  };
+}
