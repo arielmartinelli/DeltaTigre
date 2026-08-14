@@ -16,7 +16,15 @@ export const metadata: Metadata = {
     description: "Dos casas de madera con deck y galería en el Delta de Tigre.",
     images: ["/img/delta-uno/13.webp"],
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true, follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
+  alternates: { canonical: "/" },
+  // Search Console: pegar el código en NEXT_PUBLIC_GOOGLE_VERIFICATION
+  verification: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION }
+    : undefined,
   icons: { icon: "/brand/logo.png", apple: "/brand/logo.png" },
 };
 

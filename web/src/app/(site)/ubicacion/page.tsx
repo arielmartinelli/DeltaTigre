@@ -8,6 +8,7 @@ import { CTA } from "@/components/Button";
 import { getActiveProperties, getNearby } from "@/lib/data";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/ubicacion" },
   title: "Ubicación y cómo llegar",
   description: "Arroyo Gambado, primera sección del Delta de Tigre. Cómo llegar en lancha, tren o auto desde Buenos Aires.",
 };

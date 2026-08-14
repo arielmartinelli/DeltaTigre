@@ -6,6 +6,7 @@ import { CTA } from "@/components/Button";
 import { getActivities } from "@/lib/data";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/experiencias" },
   title: "Qué hacer en el Delta",
   description: "Navegar, pescar, remar, comer sobre el río y recorrer el casco histórico de Tigre desde el Arroyo Gambado.",
 };
