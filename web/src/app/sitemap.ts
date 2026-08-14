@@ -1,16 +1,24 @@
 import type { MetadataRoute } from "next";
 import { getActiveProperties } from "@/lib/data";
-const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+import { siteUrl } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const base = siteUrl();
+  const now = new Date();
+
   let props: Awaited<ReturnType<typeof getActiveProperties>> = [];
   try { props = await getActiveProperties(); } catch {}
-  const now = new Date();
+
   return [
-    { url: base, lastModified: now, priority: 1 },
-    { url: `${base}/cabanas`, lastModified: now, priority: 0.9 },
-    { url: `${base}/ubicacion`, lastModified: now, priority: 0.7 },
-    { url: `${base}/experiencias`, lastModified: now, priority: 0.7 },
-    ...props.map((p) => ({ url: `${base}/cabanas/${p.slug}`, lastModified: now, priority: 0.95 })),
+    { url: `${base}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
+    { url: `${base}/cabanas`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${base}/ubicacion`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/experiencias`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    ...props.map((p) => ({
+      url: `${base}/cabanas/${p.slug}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.95,
+    })),
   ];
 }
